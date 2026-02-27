@@ -6,6 +6,7 @@ const connectDb = require('./config/db');
 const authRoutes = require('./routes/auth');
 const medicationRoutes = require('./routes/medications');
 const doseRoutes = require('./routes/doses');
+const notifyRoutes = require('./routes/notify');
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/medications', medicationRoutes);
 app.use('/api/doses', doseRoutes);
+app.use('/api/notify', notifyRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ error: 'Route not found.' });

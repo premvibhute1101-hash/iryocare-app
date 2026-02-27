@@ -1,9 +1,11 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { OAuth2Client } = require('google-auth-library');
 const User = require('../models/User');
 
 const router = express.Router();
+const googleClient = new OAuth2Client();
 
 function buildToken(user) {
   return jwt.sign(
@@ -70,6 +72,45 @@ router.post('/login', async (req, res) => {
     });
   } catch (err) {
     return res.status(500).json({ error: 'Login failed.' });
+  }
+});
+
+router.post('/google', async (req, res) => {
+  try {
+    const idToken = String(req.body.idToken || '').trim();
+    const audience = String(process.env.GOOGLE_CLIENT_ID || '').trim();
+    if (!idToken) {
+      return res.status(400).json({ error: 'Google token is required.' });
+    }
+    if (!audience) {
+      return res.status(500).json({ error: 'Google auth is not configured on server.' });
+    }
+
+    const ticket = await googleClient.verifyIdToken({
+      idToken,
+      audience
+    });
+    const payload = ticket.getPayload();
+    const email = String((payload && payload.email) || '').trim().toLowerCase();
+    const name =
+      String((payload && (payload.name || payload.given_name)) || '').trim() || 'Google User';
+    if (!email) {
+      return res.status(400).json({ error: 'Google account email not available.' });
+    }
+
+    let user = await User.findOne({ email });
+    if (!user) {
+      const passwordHash = await bcrypt.hash(`google_${Date.now()}_${Math.random()}`, 10);
+      user = await User.create({ name, email, passwordHash });
+    }
+
+    const token = buildToken(user);
+    return res.json({
+      token,
+      user: { id: String(user._id), name: user.name, email: user.email }
+    });
+  } catch (err) {
+    return res.status(401).json({ error: 'Google authentication failed.' });
   }
 });
 
