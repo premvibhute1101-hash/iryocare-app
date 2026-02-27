@@ -1,4 +1,6 @@
 const express = require('express');
+const fs = require('fs');
+const path = require('path');
 const { GoogleAuth } = require('google-auth-library');
 const { authRequired } = require('../middleware/auth');
 
@@ -18,8 +20,29 @@ function normalizeLanguageCode(input) {
   return value;
 }
 
+function resolveGoogleCredentialsPath() {
+  const fromEnv = String(process.env.GOOGLE_APPLICATION_CREDENTIALS || '').trim();
+  if (fromEnv) {
+    const abs = path.isAbsolute(fromEnv) ? fromEnv : path.resolve(process.cwd(), fromEnv);
+    if (fs.existsSync(abs)) return abs;
+  }
+
+  // Fallback for common typo in .env key: "GOOGLE_APPLICATION_CREDENTIALS = ..."
+  const malformed = String(process.env.GOOGLE_APPLICATION_CREDENTIALS || process.env['GOOGLE_APPLICATION_CREDENTIALS '] || '').trim();
+  if (malformed) {
+    const abs = path.isAbsolute(malformed) ? malformed : path.resolve(process.cwd(), malformed);
+    if (fs.existsSync(abs)) return abs;
+  }
+
+  // Final fallback: expected local file in server root.
+  const localDefault = path.resolve(process.cwd(), 'service-account.json');
+  if (fs.existsSync(localDefault)) return localDefault;
+  return '';
+}
+
 async function getGoogleAccessToken(scopes) {
-  const auth = new GoogleAuth({ scopes });
+  const keyFilename = resolveGoogleCredentialsPath();
+  const auth = new GoogleAuth(keyFilename ? { scopes, keyFilename } : { scopes });
   const client = await auth.getClient();
   const tokenResponse = await client.getAccessToken();
   const token = typeof tokenResponse === 'string'

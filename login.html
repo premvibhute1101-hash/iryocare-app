@@ -113,6 +113,7 @@
         <button class="btn-google" onclick="handleGoogleSignup()">
           <i class="fa-brands fa-google"></i> Sign up with Google
         </button>
+        <div id="google-signin-fallback" style="display:none; margin-top:10px;"></div>
         <div class="signup-footer">Already have an account? <a href="#" onclick="navTo('login-screen'); return false;">Log In</a></div>
       </div>
     </div>
@@ -1094,52 +1095,13 @@
     }
 
     async function handleGoogleSignup() {
-      const nameEl = document.getElementById('signup-name');
-      const emailEl = document.getElementById('signup-email');
       const errorEl = document.getElementById('signup-error');
+      if (typeof window.__handleGoogleSignupModern === 'function') {
+        return window.__handleGoogleSignupModern();
+      }
       if (errorEl) {
-        errorEl.style.display = 'none';
-        errorEl.textContent = '';
-      }
-
-      const client = null;
-      if (!client) {
-        if (errorEl) {
-          errorEl.style.display = 'block';
-          errorEl.textContent = 'Google sign-in is not configured.';
-        }
-        return;
-      }
-
-      const redirectUrl = `${window.location.origin}${window.location.pathname}`;
-
-      try {
-        const { error } = await client.auth.signInWithOAuth({
-          provider: 'google',
-          options: {
-            redirectTo: redirectUrl
-          }
-        });
-        if (error && errorEl) {
-          errorEl.style.display = 'block';
-          errorEl.textContent = error.message || 'Google sign-in failed.';
-          return;
-        }
-
-        // OAuth flow redirects away; this path is a safety net.
-        const name = nameEl && nameEl.value.trim() ? nameEl.value.trim() : 'Google User';
-        const email = emailEl && emailEl.value.trim() ? emailEl.value.trim() : '';
-        if (email) {
-          persistSession(email);
-          updateUserProfile(email);
-        } else if (name) {
-          updateUserProfile(name);
-        }
-      } catch (e) {
-        if (errorEl) {
-          errorEl.style.display = 'block';
-          errorEl.textContent = 'Unable to start Google sign-in.';
-        }
+        errorEl.style.display = 'block';
+        errorEl.textContent = 'Google sign-in is still loading. Please try again.';
       }
     }
 
@@ -3132,6 +3094,27 @@
       errorEl.textContent = message;
     }
 
+    function showGoogleFallbackButton(reason) {
+      const wrap = document.getElementById('google-signin-fallback');
+      if (!wrap || !window.google || !window.google.accounts || !window.google.accounts.id) return;
+      wrap.style.display = 'block';
+      wrap.innerHTML = '';
+      try {
+        window.google.accounts.id.renderButton(wrap, {
+          theme: 'outline',
+          size: 'large',
+          text: 'signup_with',
+          shape: 'pill',
+          width: 280
+        });
+        if (reason) {
+          showGoogleError('One Tap skipped (' + reason + '). Use the Google button below.');
+        }
+      } catch (e) {
+        showGoogleError('Google fallback button could not be rendered.');
+      }
+    }
+
     async function handleGoogleCredentialResponse(response) {
       const idToken = response && response.credential ? String(response.credential) : '';
       if (!idToken) {
@@ -3282,12 +3265,32 @@
       }
 
       try {
-        window.google.accounts.id.prompt();
+        const fallbackWrap = document.getElementById('google-signin-fallback');
+        if (fallbackWrap) {
+          fallbackWrap.style.display = 'none';
+          fallbackWrap.innerHTML = '';
+        }
+        window.google.accounts.id.prompt((notification) => {
+          if (!notification) return;
+          if (notification.isNotDisplayed && notification.isNotDisplayed()) {
+            const reason = notification.getNotDisplayedReason ? notification.getNotDisplayedReason() : 'not_displayed';
+            showGoogleFallbackButton(reason);
+          } else if (notification.isSkippedMoment && notification.isSkippedMoment()) {
+            const reason = notification.getSkippedReason ? notification.getSkippedReason() : 'skipped';
+            showGoogleFallbackButton(reason);
+          } else if (notification.isDismissedMoment && notification.isDismissedMoment()) {
+            const reason = notification.getDismissedReason ? notification.getDismissedReason() : 'dismissed';
+            if (reason !== 'credential_returned') {
+              showGoogleFallbackButton(reason);
+            }
+          }
+        });
         showReminderToast('Choose your Google account to continue.');
       } catch (e) {
-        showGoogleError('Unable to start Google sign-in.');
+        showGoogleError('Unable to start Google sign-in. Check browser popup/cookies.');
       }
     };
+    window.__handleGoogleSignupModern = handleGoogleSignup;
 
     handleLogout = async function () {
       clearMongoSession();
