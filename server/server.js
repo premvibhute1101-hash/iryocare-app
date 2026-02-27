@@ -10,8 +10,27 @@ const notifyRoutes = require('./routes/notify');
 
 const app = express();
 
+const allowedOrigins = (process.env.CLIENT_ORIGIN || '')
+  .split(',')
+  .map(v => v.trim())
+  .filter(Boolean);
+
+function isAllowedOrigin(origin) {
+  if (!origin) return true; // Native apps / curl / same-device contexts
+  if (allowedOrigins.includes('*')) return true;
+  if (allowedOrigins.includes(origin)) return true;
+  if (origin.startsWith('http://localhost')) return true;
+  if (origin.startsWith('http://127.0.0.1')) return true;
+  if (origin.startsWith('capacitor://localhost')) return true;
+  if (origin.startsWith('ionic://localhost')) return true;
+  return false;
+}
+
 app.use(cors({
-  origin: process.env.CLIENT_ORIGIN ? process.env.CLIENT_ORIGIN.split(',').map(v => v.trim()) : true
+  origin(origin, callback) {
+    if (isAllowedOrigin(origin)) return callback(null, true);
+    return callback(new Error(`CORS blocked for origin: ${origin}`));
+  }
 }));
 app.use(express.json());
 
