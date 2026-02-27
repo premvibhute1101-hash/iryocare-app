@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IRYOCARE | Professional Medical Admin</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --success: #10b981;
+            --danger: #f43f5e;
+            --warning: #f59e0b;
+            --bg: #030712;
+            --bg-accent: #1e293b;
+            --card: #111827;
+            --sidebar-bg: #000000;
+            --border: #1e293b;
+            --border-strong: #334155;
+            --input-bg: #1e293b;
+            --soft: rgba(255,255,255,0.03);
+            --soft-2: rgba(255,255,255,0.02);
+            --soft-border: rgba(255,255,255,0.05);
+            --glass: rgba(17, 24, 39, 0.8);
+            --text: #f8fafc;
+            --text-dim: #64748b;
+        }
+        :root[data-theme='light'] {
+            --bg: #f8fafc;
+            --bg-accent: #e2e8f0;
+            --card: #ffffff;
+            --sidebar-bg: #ffffff;
+            --border: #cbd5e1;
+            --border-strong: #94a3b8;
+            --input-bg: #ffffff;
+            --soft: rgba(2, 6, 23, 0.04);
+            --soft-2: rgba(2, 6, 23, 0.03);
+            --soft-border: rgba(15, 23, 42, 0.12);
+            --glass: rgba(255, 255, 255, 0.85);
+            --text: #061018;
+            --text-dim: #475569;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
+
+        /* --- LOGIN SCREEN --- */
+        #login-screen { position: fixed; inset: 0; background: var(--bg); z-index: 10000; display: flex; align-items: center; justify-content: center; background-image: radial-gradient(circle at 100% 0%, rgba(59, 130, 246, 0.1), transparent 40%); transition: 0.8s; }
+        .login-card { width: 440px; padding: 45px; border-radius: 28px; background: var(--glass); backdrop-filter: blur(20px); border: 1px solid var(--border); text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
+        .login-logo { width: 120px; height: auto; margin-bottom: 20px; filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.3)); }
+        .login-input { width: 100%; padding: 14px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 12px; color: var(--text); margin-bottom: 16px; outline: none; }
+        .login-input::placeholder { color: var(--text-dim); }
+        .btn-login { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; font-size: 16px; }
+
+        /* --- DASHBOARD NAVIGATION --- */
+        .sidebar { width: 260px; background: var(--sidebar-bg); padding: 35px 20px; border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+        .sidebar-logo { width: 140px; margin-bottom: 40px; padding-left: 10px; }
+        .nav-link { padding: 14px 18px; border-radius: 12px; color: var(--text-dim); cursor: pointer; display: flex; align-items: center; gap: 12px; margin-bottom: 8px; transition: 0.2s; font-weight: 600; }
+        .nav-link.active { background: var(--primary); color: white; box-shadow: 0 4px 15px var(--primary); }
+        
+        /* --- MAIN CONTENT --- */
+        .main { flex: 1; padding: 40px; overflow-y: auto; display: none; background: radial-gradient(circle at top right, var(--bg-accent), var(--bg)); }
+        .view { display: none; }
+        .view.active { display: block; animation: slideUp 0.4s ease forwards; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        .card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 25px; margin-bottom: 25px; }
+        
+        /* --- TABLES & TAGS --- */
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; color: var(--text-dim); font-size: 11px; text-transform: uppercase; padding-bottom: 15px; border-bottom: 1px solid var(--border); }
+        td { padding: 18px 0; border-bottom: 1px solid var(--border); }
+        .med-tag { background: rgba(59, 130, 246, 0.1); color: var(--primary); padding: 4px 10px; border-radius: 6px; font-size: 11px; margin-right: 6px; border: 1px solid rgba(59, 130, 246, 0.2); display: inline-block; margin-bottom: 4px; }
+
+        /* --- CALENDAR --- */
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-top: 15px; }
+        .calendar-day { aspect-ratio: 1; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; background: var(--input-bg); border: 1px solid var(--border-strong); }
+        .day-taken { background: var(--success) !important; color: white; }
+        .day-missed { background: var(--danger) !important; color: white; }
+        .day-partial { background: var(--warning) !important; color: white; }
+
+        /* --- TIME LOGS --- */
+        .time-log-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: var(--soft-2); border-radius: 10px; margin-bottom: 10px; border: 1px solid var(--soft-border); }
+        .time-badge { font-family: 'JetBrains Mono'; font-size: 12px; color: var(--primary); background: rgba(59,130,246,0.1); padding: 2px 8px; border-radius: 4px; }
+        .controls-input { background: var(--input-bg) !important; border: 1px solid var(--border-strong) !important; color: var(--text) !important; }
+        .controls-input::placeholder { color: var(--text-dim); }
+        .controls-btn { background: var(--card) !important; border: 1px solid var(--border) !important; color: var(--text-dim) !important; }
+        .muted-card { background: var(--soft) !important; }
+        .progress-track { background: var(--input-bg) !important; }
+        .sidebar-footer { border-top: 1px solid var(--border) !important; }
+
+        /* --- REPORT OVERLAY --- */
+        #doc-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000; padding: 40px; overflow-y: auto; }
+        .printable-area { background: white; color: #111; padding: 50px; border-radius: 4px; max-width: 850px; margin: 0 auto; }
+        .rep-header { display: flex; justify-content: space-between; border-bottom: 4px solid #111; padding-bottom: 20px; margin-bottom: 30px; align-items: center; }
+        .rep-logo { height: 60px; width: auto; }
+        .rep-circle-box { display: flex; align-items: center; justify-content: space-around; background: #f8fafc; padding: 30px; border-radius: 20px; margin-bottom: 30px; border: 1px solid #e2e8f0; }
+        .rep-ring-wrapper { position: relative; width: 200px; height: 200px; }
+        .rep-ring-label { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+        .rep-calendar-day { border: 1px solid #ddd; background: #f9f9f9; color: #333; height: 35px; display: flex; align-items: center; justify-content: center; font-weight: bold; border-radius: 4px; font-size: 10px; }
+
+        @media print { .no-print { display: none !important; } #doc-overlay { position: static; background: white; padding: 0; } }
+    </style>
+</head>
+<body>
+
+    <div id="login-screen">
+        <div class="login-card">
+            <img src="logo.jpeg" alt="IRYOCARE Logo" class="login-logo">
+            <h1 style="font-weight: 800; letter-spacing: -1px; margin-bottom: 5px;">IRYOCARE OS</h1>
+            <p style="color: var(--text-dim); margin-bottom: 35px; font-size: 14px;">Secure Administrative Portal</p>
+            <input id="admin-credential" type="text" class="login-input" placeholder="Admin Credential ID">
+            <input id="admin-token" type="password" class="login-input" placeholder="Security Access Token">
+            <p id="login-error" style="display:none; color:var(--danger); margin:0 0 12px; font-size:12px; text-align:left;"></p>
+            <button class="btn-login" onclick="handleLogin()">Authorize Entry</button>
+            <button class="btn-login" style="margin-top:10px; background:#0f172a; border:1px solid var(--border);" onclick="handleSignup()">Create Admin</button>
+        </div>
+    </div>
+
+    <aside class="sidebar" id="app-sidebar" style="display: none;">
+        <div class="nav-link active" onclick="show('dash', this)"><i data-lucide="users"></i> Patient Registry</div>
+        <div class="nav-link" onclick="show('intel', this)"><i data-lucide="activity"></i> Analytics Intel</div>
+        <div class="sidebar-footer" style="margin-top: auto; border-top: 1px solid #1e293b; padding-top: 20px;">
+            <div class="nav-link" onclick="location.reload()"><i data-lucide="log-out"></i> System Logout</div>
+        </div>
+    </aside>
+
+    <main class="main" id="app-main">
+        <section id="dash" class="view active">
+            <h1>Patient Registry</h1>
+            <div class="card" style="margin-top: 20px; display:flex; flex-direction:column; gap:12px;">
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <input id="table-search" class="controls-input" placeholder="Search name or Bio-ID..." style="flex:1; background:#1e293b; border:1px solid #334155; padding:10px; border-radius:8px; color:white;">
+                    <select id="page-size" class="controls-input" style="background:#1e293b; border:1px solid #334155; padding:10px; border-radius:8px; color:white;">
+                        <option value="5">5 / page</option>
+                        <option value="10">10 / page</option>
+                        <option value="25">25 / page</option>
+                    </select>
+                    <button id="export-btn" class="controls-btn" style="background:transparent; color:var(--text-dim); border:1px solid #1e293b; padding:8px 12px; border-radius:8px; cursor:pointer;">Export CSV</button>
+                    <label style="display:flex; align-items:center; gap:8px; color:var(--text-dim); font-weight:600;"><input id="theme-toggle" type="checkbox"> Light</label>
+                </div>
+                <div style="overflow:auto;">
+                    <table style="min-width:800px;">
+                        <thead><tr><th data-sort="index" style="cursor:pointer;">#</th><th data-sort="name" style="cursor:pointer;">SUBJECT</th><th data-sort="id" style="cursor:pointer;">BIO-ID</th><th>ACTIVE MEDICATIONS</th><th>ACTION</th></tr></thead>
+                        <tbody id="dash-list"></tbody>
+                    </table>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div style="color:var(--text-dim);">Page <span id="page-num">1</span> of <span id="page-total">1</span></div>
+                    <div>
+                        <button id="prev-page" class="controls-btn" style="background:#111827; color:var(--text-dim); border:1px solid #1e293b; padding:6px 10px; border-radius:8px; margin-right:6px;">Prev</button>
+                        <button id="next-page" class="controls-btn" style="background:#111827; color:var(--text-dim); border:1px solid #1e293b; padding:6px 10px; border-radius:8px;">Next</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <h3 style="margin-bottom:12px;">Realtime Alerts</h3>
+                <div id="admin-notify-list" style="display:flex; flex-direction:column; gap:8px; color:var(--text-dim); font-size:13px;">
+                    <div>No alerts yet.</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="intel" class="view">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                <h1>Fulfillment Intelligence</h1>
+                <div style="display:flex; gap:10px;">
+                    <button id="export-data-btn" style="display:none; background:var(--primary); color:white; border:none; padding:10px 16px; border-radius:8px; font-weight:700; cursor:pointer;">Export Data</button>
+                    <button id="rep-btn" style="display:none; background:var(--success); color:white; border:none; padding:12px 24px; border-radius:10px; font-weight:800; cursor:pointer;" onclick="generateReport()">
+                        <i data-lucide="file-check"></i> Export Audit
+                    </button>
+                </div>
+            </div>
+            <div class="card muted-card" style="display: grid; grid-template-columns: 2fr 1fr auto; gap: 15px; background: rgba(255,255,255,0.03);">
+                <input id="intel-query" class="controls-input" placeholder="Search Bio-ID (e.g., IRY-101)..." style="background:#1e293b; border:1px solid #334155; padding:12px; border-radius:10px; color:white;">
+                <select id="month-select" class="controls-input" style="background:#1e293b; border:1px solid #334155; padding:12px; border-radius:10px; color:white;">
+                    <option value="0">January 2026</option>
+                    <option value="1" selected>February 2026</option>
+                    <option value="2">March 2026</option>
+                </select>
+                <button style="background:var(--primary); color:white; border:none; padding:12px 24px; border-radius:10px; font-weight:800; cursor:pointer;" onclick="runAnalysis()">Analyze</button>
+            </div>
+
+            <!-- Anomaly Alerts -->
+            <div id="anomaly-alert" class="card" style="display:none; background:rgba(244,63,94,0.1); border:1px solid rgba(244,63,94,0.3); color:var(--danger);">
+                <strong>⚠ Alert:</strong> <span id="alert-text"></span>
+            </div>
+
+            <div id="results" style="display: none;">
+                <!-- Top Stats Row -->
+                <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:15px; margin-bottom:20px;">
+                    <div class="card" style="text-align:center;">
+                        <div style="font-size:28px; font-weight:700; color:var(--success);" id="stat-taken">0</div>
+                        <div style="font-size:11px; color:var(--text-dim); text-transform:uppercase;">Doses Taken</div>
+                    </div>
+                    <div class="card" style="text-align:center;">
+                        <div style="font-size:28px; font-weight:700; color:var(--warning);" id="stat-partial">0</div>
+                        <div style="font-size:11px; color:var(--text-dim); text-transform:uppercase;">Partial Days</div>
+                    </div>
+                    <div class="card" style="text-align:center;">
+                        <div style="font-size:28px; font-weight:700; color:var(--danger);" id="stat-missed">0</div>
+                        <div style="font-size:11px; color:var(--text-dim); text-transform:uppercase;">Doses Missed</div>
+                    </div>
+                    <div class="card" style="text-align:center;">
+                        <div style="font-size:28px; font-weight:700; color:var(--primary);" id="ring-pcnt">0%</div>
+                        <div style="font-size:11px; color:var(--text-dim); text-transform:uppercase;">Compliance</div>
+                    </div>
+                </div>
+
+                <!-- Main Charts Row -->
+                <div style="display:grid; grid-template-columns:1fr 1.5fr; gap:20px;">
+                    <!-- Left: Overall Ring & Med Breakdown -->
+                    <div>
+                        <div class="card" style="text-align: center;">
+                            <h4 style="margin-bottom:15px;">Compliance Trend</h4>
+                            <canvas id="ringChart" style="max-height: 150px;"></canvas>
+                        </div>
+                        <div class="card" style="margin-top:15px;">
+                            <h4 style="margin-bottom:15px;">Per-Medication Adherence</h4>
+                            <div id="med-breakdown" style="display:flex; flex-direction:column; gap:10px;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Compliance Heatmap Calendar -->
+                    <div class="card">
+                        <h4 style="margin-bottom:15px;" id="cal-month">---</h4>
+                        <div class="calendar-grid" id="calendar-body" style="margin-bottom:20px;"></div>
+                        <div style="font-size:11px; color:var(--text-dim);">
+                            <div style="display:flex; gap:10px; margin-bottom:10px;">
+                                <div style="width:20px; height:20px; background:var(--success); border-radius:4px;"></div>
+                                <span>Fully Taken</span>
+                            </div>
+                            <div style="display:flex; gap:10px; margin-bottom:10px;">
+                                <div style="width:20px; height:20px; background:var(--warning); border-radius:4px;"></div>
+                                <span>Partial Taken</span>
+                            </div>
+                            <div style="display:flex; gap:10px;">
+                                <div style="width:20px; height:20px; background:var(--danger); border-radius:4px;"></div>
+                                <span>Missed</span>
+                            </div>
+                        </div>
+                        <div id="day-tooltip" style="margin-top:15px; padding:10px; background:rgba(59,130,246,0.1); border-radius:8px; font-size:12px; color:var(--primary); display:none;"></div>
+                    </div>
+                </div>
+
+                <!-- Trend Line Chart -->
+                <div class="card" style="margin-top:20px;">
+                    <h4 style="margin-bottom:15px;">Weekly Compliance Trend</h4>
+                    <canvas id="lineChart" height="80"></canvas>
+                </div>
+
+                <!-- Dosage Logs -->
+                <div class="card" style="margin-top:20px;">
+                    <h4 style="margin-bottom:15px;">Live Dosage Schedule</h4>
+                    <div id="dose-time-list" style="display:flex; flex-direction:column; gap:8px;"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="doc-overlay">
+        <div class="printable-area">
+            <div class="rep-header">
+                <img src="https://i.ibb.co/VqC3V5H/iryocare-logo.png" class="rep-logo">
+                <div style="text-align: right;">
+                    <h1 style="font-size: 24px; font-weight: 800;">MEDICAL AUDIT DOSSIER</h1>
+                    <p>REPORT ID: <span id="rep-uuid"></span></p>
+                </div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 25px; background: #f9f9f9; padding: 20px; border-radius: 8px; border: 1px solid #eee;">
+                <div>
+                    <p><strong>SUBJECT:</strong> <span id="rep-name"></span></p>
+                    <p><strong>ID:</strong> <span id="rep-id"></span></p>
+                    <p><strong>AGE/SEX:</strong> <span id="rep-age"></span></p>
+                </div>
+                <div>
+                    <p><strong>BLOOD TYPE:</strong> <span id="rep-bg"></span></p>
+                    <p><strong>PERIOD:</strong> <span id="rep-period"></span></p>
+                </div>
+            </div>
+
+            <h3 style="color:#111; margin-bottom: 10px;">PRESCRIPTION LEDGER</h3>
+            <table style="margin-bottom: 25px; border: 1px solid #eee;">
+                <thead><tr style="background:#f4f4f4;"><th>Medicine</th><th>Dose</th><th>Freq</th></tr></thead>
+                <tbody id="rep-med-list" style="text-align: center;"></tbody>
+            </table>
+            
+            <div class="rep-circle-box">
+                <div class="rep-ring-wrapper">
+                    <canvas id="repRingChart"></canvas>
+                    <div class="rep-ring-label"><h1 id="rep-ring-val" style="font-size: 40px; color: #111;">0%</h1><p style="font-size: 11px; font-weight: bold; color: #666;">COMPLIANCE</p></div>
+                </div>
+                <ul class="rep-details" style="list-style: none;">
+                    <li><span style="color:var(--success)">●</span> Verified Taken: <span id="rep-stat-taken">0</span> Days</li>
+                    <li><span style="color:var(--warning)">●</span> Partial Fulfillment: <span id="rep-stat-partial">0</span> Days</li>
+                    <li><span style="color:var(--danger)">●</span> Critical Missed: <span id="rep-stat-missed">0</span> Days</li>
+                </ul>
+            </div>
+
+            <div id="rep-calendar-body" class="calendar-grid" style="padding: 20px; background: #f1f5f9; border-radius: 12px; margin-bottom: 30px; border: 1px solid #ddd;"></div>
+
+            <div style="margin-top: 50px; border-top: 1px solid #000; padding-top: 20px; display: flex; justify-content: space-between;">
+                <p>Medical Verification: ________________</p>
+                <p>Doctor Signature: ________________</p>
+            </div>
+
+            <div class="no-print" style="margin-top: 40px; text-align: center; display: flex; justify-content: center; gap: 15px;">
+                <button onclick="window.print()" style="padding: 12px 24px; background:var(--primary); color:white; border:none; border-radius:8px; cursor:pointer; font-weight: 700;">Print to PDF</button>
+                <button onclick="document.getElementById('doc-overlay').style.display='none'" style="padding: 12px 24px; background:var(--danger); color:white; border:none; border-radius:8px; cursor:pointer; font-weight: 700;">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = window.IRYOCARE_API_BASE || localStorage.getItem('iryocare_api_base') || 'https://iryocare-app.onrender.com/api';
+        const TOKEN_KEY = 'iryocare_admin_token';
+        let adminToken = localStorage.getItem(TOKEN_KEY) || '';
+        let realtimeTimer = null;
+        let tableState = { page: 1, pageSize: 5, search: '', sortField: '', sortDir: 1 };
+        let db = [];
+
+        function setLoginError(message) {
+            const box = document.getElementById('login-error');
+            if (!box) return;
+            box.style.display = message ? 'block' : 'none';
+            box.innerText = message || '';
+        }
+
+        function openApp() {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('app-sidebar').style.display = 'flex';
+            document.getElementById('app-main').style.display = 'block';
+            lucide.createIcons();
+            startRealtimeSync();
+        }
+
+        function authHeaders(extra = {}) {
+            return {
+                'Content-Type': 'application/json',
+                ...(adminToken ? { Authorization: `Bearer ${adminToken}` } : {}),
+                ...extra
+            };
+        } 
+
+        async function apiRequest(path, options = {}) {
+            const response = await fetch(`${API_BASE}${path}`, {
+                ...options,
+                headers: authHeaders(options.headers || {})
+            });
+            if (response.status === 401) {
+                adminToken = '';
+                localStorage.removeItem(TOKEN_KEY);
+                throw new Error('Unauthorized. Please login again.');
+            }
+            if (!response.ok) {
+                const text = await response.text();
+                throw new Error(text || `Request failed (${response.status})`);
+            }
+            return response.json();
+        }
+
+        function normalizeMedication(med) {
+            return {
+                n: med?.n || med?.name || med?.medicine || 'Unknown',
+                d: med?.d || med?.dose || med?.dosage || '-',
+                f: med?.f || med?.frequency || med?.time || '-'
+            };
+        }
+
+        function normalizeHistory(history) {
+            if (!Array.isArray(history)) return [];
+            return history.map(x => Number(x)).filter(x => x === 0 || x === 1 || x === 2);
+        }
+
+        function normalizePatient(raw = {}) {
+            const meds = Array.isArray(raw.meds) ? raw.meds : (Array.isArray(raw.medications) ? raw.medications : []);
+            const histories = Array.isArray(raw.histories) ? raw.histories.map(normalizeHistory) : [];
+            return {
+                id: raw.id || raw.bioId || raw.bioID || raw.patientId || raw._id || '',
+                name: raw.name || raw.fullName || 'Unknown',
+                age: raw.age || raw.ageSex || '-',
+                bg: raw.bg || raw.bloodGroup || '-',
+                meds: meds.map(normalizeMedication),
+                histories
+            };
+        }
+
+        function normalizePatients(payload) {
+            const list = Array.isArray(payload) ? payload : (payload?.patients || payload?.data || []);
+            return list.map(normalizePatient).filter(p => p.id);
+        }
+
+        async function loadPatients() {
+            const payload = await apiRequest('/admin/patients');
+            db = normalizePatients(payload);
+            renderDash();
+        }
+
+        async function loadAdminNotifications() {
+            const payload = await apiRequest('/admin/notifications?sinceHours=24');
+            const list = Array.isArray(payload?.notifications) ? payload.notifications : [];
+            const box = document.getElementById('admin-notify-list');
+            if (!box) return;
+            if (!list.length) {
+                box.innerHTML = '<div>No alerts in last 24 hours.</div>';
+                return;
+            }
+            box.innerHTML = list.slice(0, 12).map(item => `
+                <div style="padding:10px; border:1px solid var(--border); border-radius:10px; background:var(--soft);">
+                    <strong style="color:var(--danger);">Missed Dose</strong>
+                    <div>${item.userName || 'Unknown'} - ${item.medication || 'Medication'}</div>
+                    <div style="font-size:11px; color:var(--text-dim);">${new Date(item.scheduled_at).toLocaleString()}</div>
+                </div>
+            `).join('');
+        }
+
+        async function handleLogin() {
+            const credentialId = document.getElementById('admin-credential').value.trim();
+            const securityToken = document.getElementById('admin-token').value.trim();
+            if (!credentialId || !securityToken) {
+                setLoginError('Enter both credential ID and access token.');
+                return;
+            }
+            setLoginError('');
+            try {
+                const authPayload = await apiRequest('/admin/login', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        credentialId,
+                        securityToken,
+                        email: credentialId,
+                        password: securityToken
+                    })
+                });
+                adminToken = authPayload?.token || authPayload?.accessToken || authPayload?.jwt || '';
+                if (!adminToken) throw new Error('Login response missing token.');
+                localStorage.setItem(TOKEN_KEY, adminToken);
+                await loadPatients();
+                await loadAdminNotifications();
+                openApp();
+            } catch (error) {
+                setLoginError(error.message || 'Login failed.');
+            }
+        }
+
+        async function handleSignup() {
+            const credentialId = document.getElementById('admin-credential').value.trim();
+            const securityToken = document.getElementById('admin-token').value.trim();
+            if (!credentialId || !securityToken) {
+                setLoginError('Enter credential ID and access token for signup.');
+                return;
+            }
+            setLoginError('');
+            try {
+                const authPayload = await apiRequest('/admin/signup', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        credentialId,
+                        securityToken,
+                        email: credentialId.includes('@') ? credentialId : ''
+                    })
+                });
+                adminToken = authPayload?.token || '';
+                if (!adminToken) throw new Error('Signup response missing token.');
+                localStorage.setItem(TOKEN_KEY, adminToken);
+                await loadPatients();
+                await loadAdminNotifications();
+                openApp();
+            } catch (error) {
+                setLoginError(error.message || 'Signup failed.');
+            }
+        }
+
+        function startRealtimeSync() {
+            if (realtimeTimer) clearInterval(realtimeTimer);
+            realtimeTimer = setInterval(async () => {
+                if (!adminToken) return;
+                try {
+                    await loadPatients();
+                    await loadAdminNotifications();
+                    if (current) {
+                        const currentId = current.id;
+                        const refreshed = db.find(p => p.id === currentId);
+                        if (refreshed) current = refreshed;
+                    }
+                } catch (_) {
+                    // keep existing view when refresh fails
+                }
+            }, 30000);
+        }
+        function show(v, el) { document.querySelectorAll('.view').forEach(x => x.classList.remove('active')); document.querySelectorAll('.nav-link').forEach(x => x.classList.remove('active')); document.getElementById(v).classList.add('active'); el.classList.add('active'); if(v === 'dash') renderDash(); }
+        function renderDash() {
+            const out = document.getElementById('dash-list');
+            const search = (tableState.search || '').toLowerCase();
+            let filtered = db.filter(p => p.name.toLowerCase().includes(search) || p.id.toLowerCase().includes(search));
+            if(tableState.sortField) {
+                filtered.sort((a,b) => {
+                    const f = tableState.sortField;
+                    let av = (f === 'index') ? 0 : (a[f] || '').toString().toLowerCase();
+                    let bv = (f === 'index') ? 0 : (b[f] || '').toString().toLowerCase();
+                    if(av < bv) return -1 * tableState.sortDir;
+                    if(av > bv) return 1 * tableState.sortDir;
+                    return 0;
+                });
+            }
+            const totalPages = Math.max(1, Math.ceil(filtered.length / tableState.pageSize));
+            if(tableState.page > totalPages) tableState.page = totalPages;
+            const start = (tableState.page - 1) * tableState.pageSize;
+            const pageItems = filtered.slice(start, start + tableState.pageSize);
+            out.innerHTML = pageItems.map((p, i) => {
+                const realIndex = db.indexOf(p);
+                return `<tr>
+                    <td>${start + i + 1}</td>
+                    <td><strong>${p.name}</strong></td>
+                    <td style="color:var(--primary); font-family: 'JetBrains Mono'">${p.id}</td>
+                    <td>${p.meds.map(m => `<span class="med-tag">${m.n}</span>`).join('')}</td>
+                    <td style="white-space:nowrap;">
+                        <button onclick="navTo('${p.id}')" style="cursor:pointer; background:var(--primary); color:white; border:none; padding:5px 10px; border-radius:6px;">Analyze</button>
+                    </td>
+                </tr>`;
+            }).join('');
+            document.getElementById('page-num').innerText = tableState.page;
+            document.getElementById('page-total').innerText = totalPages;
+        }
+
+        function navTo(id) { document.getElementById('intel-query').value = id; show('intel', document.querySelectorAll('.nav-link')[1]); runAnalysis(); }
+
+
+
+        function exportCSV() {
+            const search = (tableState.search || '').toLowerCase();
+            const filtered = db.filter(p => p.name.toLowerCase().includes(search) || p.id.toLowerCase().includes(search));
+            const rows = [['Bio-ID','Name','Age','BloodGroup','Meds']];
+            filtered.forEach(p => rows.push([p.id, p.name, p.age, p.bg, p.meds.map(m=>m.n+'('+m.d+')').join('; ')]));
+            const csv = rows.map(r => r.map(c => '"' + (''+c).replace(/"/g,'""') + '"').join(',')).join('\n');
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'patients.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+        }
+
+        function toggleTheme(isLight) {
+            document.documentElement.setAttribute('data-theme', isLight ? 'light' : 'dark');
+            localStorage.setItem('iryocare_theme', isLight ? 'light' : 'dark');
+        }
+
+        function setupTableControls() {
+            const searchInput = document.getElementById('table-search');
+            const pageSize = document.getElementById('page-size');
+            searchInput.addEventListener('input', (e) => { tableState.search = e.target.value; tableState.page = 1; renderDash(); });
+            pageSize.addEventListener('change', (e) => { tableState.pageSize = Number(e.target.value); tableState.page = 1; renderDash(); });
+            document.getElementById('prev-page').addEventListener('click', () => { if(tableState.page>1){ tableState.page--; renderDash(); }});
+            document.getElementById('next-page').addEventListener('click', () => { tableState.page++; renderDash(); });
+            document.getElementById('export-btn').addEventListener('click', exportCSV);
+            const themeToggle = document.getElementById('theme-toggle');
+            const savedTheme = localStorage.getItem('iryocare_theme') || 'dark';
+            themeToggle.checked = savedTheme === 'light';
+            toggleTheme(themeToggle.checked);
+            themeToggle.addEventListener('change', (e) => toggleTheme(e.target.checked));
+            document.querySelectorAll('th[data-sort]').forEach(th => th.addEventListener('click', () => { const f = th.dataset.sort; if(tableState.sortField === f) tableState.sortDir *= -1; else { tableState.sortField = f; tableState.sortDir = 1; } renderDash(); }));
+        }
+
+        // initialize controls on load
+        window.addEventListener('load', async () => {
+            setupTableControls();
+            setupAnalyticsControls();
+            lucide.createIcons();
+            document.getElementById('admin-credential').addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') handleLogin();
+            });
+            document.getElementById('admin-token').addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') handleLogin();
+            });
+
+            if (!adminToken) {
+                renderDash();
+                return;
+            }
+            try {
+                await loadPatients();
+                await loadAdminNotifications();
+                openApp();
+            } catch (_) {
+                adminToken = '';
+                localStorage.removeItem(TOKEN_KEY);
+                setLoginError('Session expired. Login again.');
+                renderDash();
+            }
+        });
+
+        let current = null; let charts = {};
+
+        function mergeAnalytics(patient, payload, monthIndex) {
+            const source = payload?.data || payload || {};
+            const merged = normalizePatient(source.patient || patient);
+            const output = { ...patient, ...merged };
+            const meds = source.meds || source.medications;
+            if (Array.isArray(meds)) output.meds = meds.map(normalizeMedication);
+
+            if (!Array.isArray(output.histories)) output.histories = [];
+            if (Array.isArray(source.histories)) output.histories = source.histories.map(normalizeHistory);
+
+            const monthly = source.history || source.monthlyHistory || source.days;
+            if (Array.isArray(monthly)) output.histories[monthIndex] = normalizeHistory(monthly);
+            return output;
+        }
+
+        async function runAnalysis() {
+            const q = document.getElementById('intel-query').value.toUpperCase();
+            const m = Number(document.getElementById('month-select').value);
+            let p = db.find(x => String(x.id).toUpperCase() === q); if(!p) return;
+
+            try {
+                const payload = await apiRequest(`/admin/patients/${encodeURIComponent(p.id)}/analytics?month=${m}`);
+                p = mergeAnalytics(p, payload, m);
+                db = db.map(item => item.id === p.id ? p : item);
+            } catch (_) {
+                // Use patient list data if analytics endpoint is unavailable.
+            }
+            current = p;
+            document.getElementById('results').style.display = 'block'; 
+            document.getElementById('rep-btn').style.display = 'block';
+            document.getElementById('export-data-btn').style.display = 'block';
+            const months = ["January", "February", "March"];
+            document.getElementById('cal-month').innerText = `${months[m] || `Month ${m + 1}`} 2026`;
+            
+            const logContainer = document.getElementById('dose-time-list');
+            logContainer.innerHTML = p.meds.map(med => {
+                const time = med.f === "Morning" ? "08:14 AM" : "09:42 PM";
+                return `<div class="time-log-item">
+                    <span style="font-size: 13px; font-weight:600;">${med.n}</span>
+                    <span class="time-badge">${time}</span>
+                </div>`;
+            }).join('');
+
+            const history = Array.isArray(p.histories?.[m]) ? p.histories[m] : [];
+            const stats = renderCharts(p, m, 'ringChart'); 
+            renderCalendar('calendar-body', history, false, p.meds);
+            renderMedBreakdown(p, m);
+            detectAnomalies(p, m, stats);
+        }
+
+        function renderMedBreakdown(patient, monthIdx) {
+            const container = document.getElementById('med-breakdown');
+            const data = Array.isArray(patient.histories?.[monthIdx]) ? patient.histories[monthIdx] : [];
+            const medsHtml = patient.meds.map((med, idx) => {
+                const everyNthTaken = data.filter((_, i) => i % (patient.meds.length || 1) === idx && _ === 1).length;
+                const total = Math.max(1, Math.ceil(data.length / (patient.meds.length || 1)));
+                const pct = Math.round((everyNthTaken / total) * 100);
+                const color = pct >= 80 ? 'var(--success)' : pct >= 50 ? 'var(--warning)' : 'var(--danger)';
+                return `<div style="display:flex; justify-content:space-between; align-items:center; padding:8px; background:rgba(255,255,255,0.02); border-radius:6px;">
+                    <span style="font-size:12px;">${med.n} (${med.d})</span>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <div class="progress-track" style="width:60px; height:6px; background:#1e293b; border-radius:3px;">
+                            <div style="width:${pct}%; height:100%; background:${color}; border-radius:3px;"></div>
+                        </div>
+                        <span style="font-weight:700; color:${color}; min-width:35px;">${pct}%</span>
+                    </div>
+                </div>`;
+            }).join('');
+            container.innerHTML = medsHtml;
+        }
+
+        function detectAnomalies(patient, monthIdx, stats) {
+            const data = Array.isArray(patient.histories?.[monthIdx]) ? patient.histories[monthIdx] : [];
+            const alertDiv = document.getElementById('anomaly-alert');
+            let anomalies = [];
+            
+            // Check for consecutive missed days
+            let consecutiveMissed = 0, maxMissed = 0;
+            for(let i=0; i<data.length; i++) {
+                if(data[i] === 0) { consecutiveMissed++; maxMissed = Math.max(maxMissed, consecutiveMissed); }
+                else consecutiveMissed = 0;
+            }
+            if(maxMissed >= 3) anomalies.push(`${maxMissed} consecutive days missed detected`);
+            
+            // Check for low compliance
+            if(stats.rate < 60) anomalies.push(`Low compliance alert: only ${stats.rate}% success rate`);
+            
+            // Check for weekend pattern
+            const weekendMissed = data.slice(5, 7).filter(x => x === 0).length;
+            if(weekendMissed > 0) anomalies.push(`Pattern caught: weekend non-compliance`);
+            
+            if(anomalies.length > 0) {
+                alertDiv.style.display = 'block';
+                document.getElementById('alert-text').innerText = anomalies[0];
+            } else {
+                alertDiv.style.display = 'none';
+            }
+        }
+
+        function renderCalendar(target, history, isReport, meds) {
+            const body = document.getElementById(target); body.innerHTML = "";
+            history.forEach((status, i) => {
+                const day = document.createElement('div'); 
+                day.className = isReport ? 'rep-calendar-day' : 'calendar-day'; 
+                day.innerText = i + 1;
+                if(status === 1) day.classList.add('day-taken'); 
+                else if(status === 2) day.classList.add('day-partial'); 
+                else if(status === 0) day.classList.add('day-missed');
+                
+                // Add hover tooltip for drilldown
+                if(!isReport && meds) {
+                    day.style.cursor = 'pointer';
+                    day.addEventListener('mouseenter', () => {
+                        const tooltip = document.getElementById('day-tooltip');
+                        const statusText = status === 1 ? '✓ Fully taken' : status === 2 ? '⊘ Partial taken' : '✗ Missed';
+                        const medsTooltip = meds.map((m, idx) => `${m.n}: ${status === 1 ? 'taken' : 'not taken'}`).join(' | ');
+                        tooltip.innerHTML = `<strong>Day ${i+1}:</strong> ${statusText}<br>${medsTooltip}`;
+                        tooltip.style.display = 'block';
+                    });
+                    day.addEventListener('mouseleave', () => {
+                        document.getElementById('day-tooltip').style.display = 'none';
+                    });
+                }
+                
+                body.appendChild(day);
+            });
+        }
+
+        function renderCharts(p, m, canvasId) {
+            const data = Array.isArray(p.histories?.[m]) ? p.histories[m] : [];
+            if (data.length === 0) {
+                document.getElementById('stat-taken').innerText = 0;
+                document.getElementById('stat-partial').innerText = 0;
+                document.getElementById('stat-missed').innerText = 0;
+                document.getElementById('ring-pcnt').innerText = "0%";
+            }
+            const taken = data.filter(x => x === 1).length, missed = data.filter(x => x === 0).length, partial = data.filter(x => x === 2).length;
+            const rate = data.length ? Math.round((taken / data.length) * 100) : 0;
+            
+            // Update stats
+            document.getElementById('stat-taken').innerText = taken;
+            document.getElementById('stat-partial').innerText = partial;
+            document.getElementById('stat-missed').innerText = missed;
+            document.getElementById('ring-pcnt').innerText = rate + "%";
+            
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            if(charts[canvasId]) charts[canvasId].destroy();
+            charts[canvasId] = new Chart(ctx, { 
+                type: 'doughnut', 
+                data: { 
+                    datasets: [{ 
+                        data: [taken, missed, partial], 
+                        backgroundColor: ['#10b981', '#f43f5e', '#f59e0b'], 
+                        borderWidth: 0 
+                    }] 
+                }, 
+                options: { cutout: '80%' } 
+            });
+            
+            if(canvasId === 'ringChart') {
+                const ctxL = document.getElementById('lineChart').getContext('2d'); 
+                if(charts.l) charts.l.destroy();
+                const weeks = [];
+                for(let w=0; w<4; w++) {
+                    const start = w * 7;
+                    const end = Math.min(start + 7, data.length);
+                    const weekData = data.slice(start, end);
+                    weeks.push(weekData.length ? Math.round((weekData.filter(x=>x===1).length / weekData.length) * 100) : 0);
+                }
+                charts.l = new Chart(ctxL, { 
+                    type: 'line', 
+                    data: { 
+                        labels: ['Week 1','Week 2','Week 3','Week 4'], 
+                        datasets: [{ 
+                            label: 'Compliance %',
+                            data: weeks, 
+                            borderColor: '#3b82f6', 
+                            tension: 0.4,
+                            fill: true,
+                            backgroundColor: 'rgba(59,130,246,0.1)'
+                        }] 
+                    }, 
+                    options: { 
+                        scales: { y: { min:0, max:100 } },
+                        responsive: true,
+                        maintainAspectRatio: true
+                    } 
+                });
+            }
+            return { taken, missed, partial, rate };
+        }
+
+        function exportChartImage() {
+            const canvas = document.getElementById('ringChart');
+            if(!canvas) return;
+            const link = document.createElement('a');
+            link.href = canvas.toDataURL('image/png');
+            link.download = `compliance_chart_${current.id}.png`;
+            link.click();
+        }
+
+        function exportAnalyticsData() {
+            const m = document.getElementById('month-select').value;
+            const monthName = ["January", "February", "March"][m];
+            const data = Array.isArray(current.histories?.[m]) ? current.histories[m] : [];
+            const rows = [['Date','Status','Medications']];
+            data.forEach((status, i) => {
+                const statusStr = status === 1 ? 'Taken' : status === 2 ? 'Partial' : 'Missed';
+                const meds = current.meds.map(m => m.n).join(';');
+                rows.push([`${monthName} ${i+1}`, statusStr, meds]);
+            });
+            const csv = rows.map(r => r.map(c => '"' + (''+c).replace(/"/g,'""') + '"').join(',')).join('\n');
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `analytics_${current.id}_${monthName}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+        }
+
+        function setupAnalyticsControls() {
+            document.getElementById('export-data-btn')?.addEventListener('click', exportAnalyticsData);
+        }
+
+        function generateReport() {
+            const m = document.getElementById('month-select').value;
+            const stats = renderCharts(current, m, 'repRingChart');
+            document.getElementById('doc-overlay').style.display = 'block';
+            document.getElementById('rep-name').innerText = current.name; 
+            document.getElementById('rep-id').innerText = current.id;
+            document.getElementById('rep-age').innerText = current.age; 
+            document.getElementById('rep-bg').innerText = current.bg;
+            document.getElementById('rep-period').innerText = `${["January", "February", "March"][m]} 2026`;
+            document.getElementById('rep-uuid').innerText = Math.random().toString(36).substr(2, 6).toUpperCase();
+            document.getElementById('rep-stat-taken').innerText = stats.taken; 
+            document.getElementById('rep-stat-partial').innerText = stats.partial; 
+            document.getElementById('rep-stat-missed').innerText = stats.missed;
+            document.getElementById('rep-ring-val').innerText = stats.rate + "%";
+            document.getElementById('rep-med-list').innerHTML = current.meds.map(m => `<tr><td style="padding:10px; border-bottom:1px solid #eee;"><strong>${m.n}</strong></td><td>${m.d}</td><td>${m.f}</td></tr>`).join('');
+            renderCalendar('rep-calendar-body', Array.isArray(current.histories?.[m]) ? current.histories[m] : [], true);
+        }
+    </script>
+</body>
+</html>

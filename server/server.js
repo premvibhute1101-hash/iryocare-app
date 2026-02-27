@@ -7,6 +7,8 @@ const authRoutes = require('./routes/auth');
 const medicationRoutes = require('./routes/medications');
 const doseRoutes = require('./routes/doses');
 const notifyRoutes = require('./routes/notify');
+const adminRoutes = require('./routes/admin');
+const serviceRoutes = require('./routes/services');
 
 const app = express();
 
@@ -42,6 +44,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/medications', medicationRoutes);
 app.use('/api/doses', doseRoutes);
 app.use('/api/notify', notifyRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/services', serviceRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ error: 'Route not found.' });

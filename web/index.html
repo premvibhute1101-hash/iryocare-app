@@ -1250,10 +1250,15 @@
 
     function saveLanguage() {
       const select = document.getElementById('language-select');
+      let selected = 'en';
       if (select) {
         try {
-          localStorage.setItem('iryoLanguage', select.value);
+          selected = select.value || 'en';
+          localStorage.setItem('iryoLanguage', selected);
         } catch (e) {}
+      }
+      if (typeof applyLanguageTranslation === 'function') {
+        applyLanguageTranslation(selected).catch(() => {});
       }
       closeLanguageModal();
     }
@@ -1462,6 +1467,7 @@
         }
       }
       showReminderToast(message);
+      speakReminder(message).catch(() => {});
     }
 
     function clearReminderTimers() {
@@ -2905,6 +2911,10 @@
         const theme = localStorage.getItem('iryoTheme');
         if (theme) applyTheme(theme);
       } catch (e) {}
+      try {
+        const lang = localStorage.getItem('iryoLanguage') || 'en';
+        applyLanguageTranslation(lang).catch(() => {});
+      } catch (e) {}
       renderHistoryStrip();
       await loadHistoryTimeline();
       await loadDailyProgress();
@@ -2920,6 +2930,8 @@
     const API_BASE_URL = 'https://iryocare-app.onrender.com/api';
     const GOOGLE_CLIENT_ID = '50477322330-aprror0fe8p5t92t0t5tg2maguo924o4.apps.googleusercontent.com';
     let googleAuthInitialized = false;
+    let activeSpeechAudio = null;
+    let translationInFlight = false;
 
     function getMongoToken() {
       try { return localStorage.getItem('iryoToken') || ''; } catch (e) { return ''; }
@@ -2971,6 +2983,140 @@
       try { data = await response.json(); } catch (e) {}
       if (!response.ok) throw new Error((data && data.error) ? data.error : ('Request failed (' + response.status + ')'));
       return data || {};
+    }
+
+    function getSelectedLanguage() {
+      try {
+        return localStorage.getItem('iryoLanguage') || 'en';
+      } catch (e) {
+        return 'en';
+      }
+    }
+
+    function toTtsLanguageCode(lang) {
+      const map = {
+        en: 'en-US',
+        hi: 'hi-IN',
+        mr: 'mr-IN',
+        ta: 'ta-IN',
+        te: 'te-IN'
+      };
+      return map[String(lang || '').toLowerCase()] || 'en-US';
+    }
+
+    function rememberOriginalText(node, text) {
+      if (!node || !text) return;
+      if (node.dataset && !node.dataset.i18nBase) {
+        node.dataset.i18nBase = text;
+      }
+    }
+
+    function getTranslatableNodes() {
+      const selector = 'h1,h2,h3,h4,p,button,label,span,a,.settings-item-left,.settings-title,.review-title,.review-subtitle';
+      const nodes = Array.from(document.querySelectorAll(selector));
+      return nodes.filter((node) => {
+        if (!node || !node.textContent) return false;
+        if (node.closest('script,style')) return false;
+        if (node.querySelector('input,select,textarea')) return false;
+        const text = (node.dataset && node.dataset.i18nBase ? node.dataset.i18nBase : node.textContent).trim();
+        if (!text) return false;
+        if (text.length > 120) return false;
+        if (/^[\d\s:.,/%+-]+$/.test(text)) return false;
+        if (/^[A-Z0-9 _-]{8,}$/.test(text)) return false;
+        return true;
+      });
+    }
+
+    async function applyLanguageTranslation(lang) {
+      const target = String(lang || 'en').toLowerCase();
+      const nodes = getTranslatableNodes();
+      nodes.forEach((node) => rememberOriginalText(node, node.textContent.trim()));
+
+      if (target === 'en') {
+        nodes.forEach((node) => {
+          const base = node.dataset ? node.dataset.i18nBase : '';
+          if (base) node.textContent = base;
+        });
+        return;
+      }
+
+      if (translationInFlight) return;
+      translationInFlight = true;
+      try {
+        const originals = nodes.map((n) => (n.dataset ? n.dataset.i18nBase : n.textContent.trim())).filter(Boolean);
+        const unique = [...new Set(originals)];
+        if (!unique.length) return;
+        const payload = await mongoRequest('/services/translate', {
+          method: 'POST',
+          body: {
+            texts: unique,
+            target
+          }
+        }, 20000);
+        const translated = Array.isArray(payload.translatedTexts) ? payload.translatedTexts : [];
+        const dictionary = new Map();
+        unique.forEach((value, index) => {
+          dictionary.set(value, translated[index] || value);
+        });
+        nodes.forEach((node) => {
+          const base = node.dataset ? node.dataset.i18nBase : '';
+          if (!base) return;
+          node.textContent = dictionary.get(base) || base;
+        });
+      } catch (e) {
+        // Keep UI usable when translation API is unavailable.
+      } finally {
+        translationInFlight = false;
+      }
+    }
+
+    async function speakReminder(message) {
+      const text = String(message || '').trim();
+      if (!text || !isAuthenticated) return;
+      const lang = getSelectedLanguage();
+      const languageCode = toTtsLanguageCode(lang);
+      try {
+        const data = await mongoRequest('/services/tts', {
+          method: 'POST',
+          body: { text, languageCode, speakingRate: 0.95 }
+        }, 20000);
+        if (!data || !data.audioContent) throw new Error('missing audio');
+        if (activeSpeechAudio) {
+          try { activeSpeechAudio.pause(); } catch (e) {}
+        }
+        const audio = new Audio('data:' + (data.mimeType || 'audio/mpeg') + ';base64,' + data.audioContent);
+        activeSpeechAudio = audio;
+        await audio.play();
+      } catch (e) {
+        if ('speechSynthesis' in window) {
+          const utterance = new SpeechSynthesisUtterance(text);
+          utterance.lang = languageCode;
+          window.speechSynthesis.cancel();
+          window.speechSynthesis.speak(utterance);
+        }
+      }
+    }
+
+    async function ocrTextFromVision(imageBase64) {
+      if (!imageBase64) return '';
+      try {
+        const data = await mongoRequest('/services/ocr/vision', {
+          method: 'POST',
+          body: { imageBase64 }
+        }, 25000);
+        return String(data.text || '').trim();
+      } catch (e) {
+        return '';
+      }
+    }
+
+    function fileToDataUrl(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result || ''));
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
     }
 
     function getGoogleErrorElement() {
@@ -3738,6 +3884,10 @@
 
       ctx.drawImage(videoEl, 0, 0, canvas.width, canvas.height);
       const imageDataUrl = canvas.toDataURL('image/jpeg', 0.92);
+      const visionText = await ocrTextFromVision(imageDataUrl);
+      if (visionText) {
+        return parseOcrPrescriptionText(visionText);
+      }
       const result = await window.Tesseract.recognize(imageDataUrl, 'eng');
       const text = result && result.data && result.data.text ? result.data.text : '';
       return parseOcrPrescriptionText(text);
@@ -3745,6 +3895,13 @@
 
     async function performPrescriptionOcrFromImageFile(file) {
       if (!file || !window.Tesseract || !window.Tesseract.recognize) return [];
+      const imageDataUrl = await fileToDataUrl(file).catch(() => '');
+      if (imageDataUrl) {
+        const visionText = await ocrTextFromVision(imageDataUrl);
+        if (visionText) {
+          return parseOcrPrescriptionText(visionText);
+        }
+      }
       const result = await window.Tesseract.recognize(file, 'eng');
       const text = result && result.data && result.data.text ? result.data.text : '';
       return parseOcrPrescriptionText(text);
