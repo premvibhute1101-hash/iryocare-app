@@ -1,0 +1,8 @@
+service-account.json
+*.service-account.json
+*.pem
+*.key
+*.p12
+
+server/node_modules/
+server/.env

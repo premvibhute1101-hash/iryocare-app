@@ -1,0 +1,3669 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IryoCare App Prototype</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="mobile-frame">
+    
+    <!-- Splash Screen -->
+    <div id="splash-screen" class="screen active">
+      <div class="bg-shape shape-circle-top"></div>
+      <div class="bg-shape shape-pill-right"></div>
+      <div class="bg-shape shape-circle-bottom"></div>
+      <div class="splash-content">
+        <img class="logo-svg" src="splash-logo.png" alt="IryoCare logo" onerror="this.onerror=null;this.src='login-hero1.jpeg';">
+        <div class="logo-subtext">IRYOCARE</div>
+        <h1 class="app-title">Iryo<span>Care</span></h1>
+        <p class="tagline">Your health, on schedule</p>
+        <div class="loading-container">
+          <div class="loading-text"><span>INITIALIZING</span><span>...</span></div>
+          <div class="progress-track"><div class="progress-fill"></div></div>
+        </div>
+      </div>
+      <div class="splash-footer">Secure & Private</div>
+    </div>
+
+    <!-- Login Screen -->
+    <div id="login-screen" class="screen">
+      <div class="scrollable-content">
+        <div class="login-header">
+          <div class="header-icon"><i class="fa-solid fa-briefcase-medical"></i></div>
+          <h2>IryoCare</h2>
+        </div>
+        <div class="illustration">
+          <img src="login-hero.png" alt="Medication care illustration" onerror="this.onerror=null;this.src='login-hero1.jpeg';">
+        </div>
+        <div class="welcome-text">
+          <h1>Welcome</h1>
+          <p>Log in to manage your medications and stay on track with your health.</p>
+        </div>
+        <div class="input-group">
+          <label>Email or Phone Number</label>
+          <div class="input-wrapper">
+            <i class="fa-regular fa-envelope icon-left"></i>
+            <input id="login-identifier" type="text" placeholder="example@email.com">
+          </div>
+        </div>
+        <div class="input-group">
+          <label><span>Password</span><a href="#">Forgot Password?</a></label>
+          <div class="input-wrapper">
+            <i class="fa-solid fa-lock icon-left"></i>
+            <input id="login-password" type="password" placeholder="Enter your password">
+            <i id="toggle-password-visibility" class="fa-regular fa-eye icon-right"></i>
+          </div>
+        </div>
+        <div id="login-error" class="error-message" style="display:none;"></div>
+        <button class="btn-primary" onclick="handleLogin()">Log In <i class="fa-solid fa-arrow-right-to-bracket"></i></button>
+        <div class="biometrics" onclick="handleBiometricLogin()"><i class="fa-solid fa-fingerprint fa-lg"></i> Use Biometrics</div>
+        <div class="signup-footer">Don't have an account? <a href="#" onclick="navTo('signup-screen'); return false;">Sign Up</a></div>
+      </div>
+    </div>
+
+    <!-- Signup Screen -->
+    <div id="signup-screen" class="screen">
+      <div class="scrollable-content">
+        <div class="login-header">
+          <div class="header-icon"><i class="fa-solid fa-user-plus"></i></div>
+          <h2>Create Account</h2>
+        </div>
+        <div class="welcome-text">
+          <h1>Join IryoCare</h1>
+          <p>Create an account to securely manage your medications and reminders.</p>
+        </div>
+        <div class="input-group">
+          <label>Full Name</label>
+          <div class="input-wrapper">
+            <i class="fa-regular fa-user icon-left"></i>
+            <input id="signup-name" type="text" placeholder="Your name">
+          </div>
+        </div>
+        <div class="input-group">
+          <label>Email</label>
+          <div class="input-wrapper">
+            <i class="fa-regular fa-envelope icon-left"></i>
+            <input id="signup-email" type="email" placeholder="you@example.com">
+          </div>
+        </div>
+        <div class="input-group">
+          <label>Password</label>
+          <div class="input-wrapper">
+            <i class="fa-solid fa-lock icon-left"></i>
+            <input id="signup-password" type="password" placeholder="Create a password">
+          </div>
+        </div>
+        <div class="input-group">
+          <label>Confirm Password</label>
+          <div class="input-wrapper">
+            <i class="fa-solid fa-lock icon-left"></i>
+            <input id="signup-password-confirm" type="password" placeholder="Re-enter password">
+          </div>
+        </div>
+        <div id="signup-error" class="error-message" style="display:none;"></div>
+        <button class="btn-primary" onclick="handleSignup()">
+          Create Account <i class="fa-solid fa-user-check"></i>
+        </button>
+        <div class="auth-divider"><span>or</span></div>
+        <button class="btn-google" onclick="handleGoogleSignup()">
+          <i class="fa-brands fa-google"></i> Sign up with Google
+        </button>
+        <div class="signup-footer">Already have an account? <a href="#" onclick="navTo('login-screen'); return false;">Log In</a></div>
+      </div>
+    </div>
+
+    <!-- Home Screen -->
+    <div id="home-screen" class="screen">
+      <div class="scrollable-content">
+        <div class="app-bar">
+          <div class="profile-info">
+            <div class="avatar"><i class="fa-regular fa-user"></i></div>
+            <div class="profile-text"><h2>IryoCare</h2><p>Monday, Oct 23</p></div>
+          </div>
+          <i class="fa-regular fa-calendar" style="font-size: 20px; color: var(--text-gray);" onclick="navTo('history-screen')"></i>
+        </div>
+        <div class="alert-box" id="home-missed-alert" style="display:none;">
+          <div class="alert-icon"><i class="fa-solid fa-circle-exclamation"></i></div>
+          <div class="alert-content">
+            <h3 id="home-missed-alert-title">Missed Dose Alert</h3>
+            <p id="home-missed-alert-text">You missed 1 dose of Ibuprofen at 8:00 AM.</p>
+            <a href="#" onclick="navTo('history-screen')">View Details &rarr;</a>
+          </div>
+        </div>
+        <div class="progress-header"><span>Daily Progress</span><span id="daily-progress-text">0 of 0 taken</span></div>
+        <div class="progress-bar"><div class="progress-fill-home" id="daily-progress-fill"></div></div>
+        <div class="progress-msg" id="daily-progress-msg">Log in to view today's progress.</div>
+        <div class="scan-card">
+          <div class="scan-icon-wrapper"><i class="fa-solid fa-camera"></i></div>
+          <h3>Scan Prescription</h3>
+          <p>Automatically schedule your medications by scanning your prescription label.</p>
+          <button class="btn-scan" onclick="startCameraScan()">Scan Now</button>
+          <button class="btn-secondary" style="margin-top:10px;" onclick="triggerPrescriptionUpload()">
+            <i class="fa-regular fa-image"></i> Upload Prescription Image
+          </button>
+        </div>
+        <div class="doses-header">
+          <h3>Upcoming Doses</h3>
+          <div class="doses-badge">Next: 1:00 PM</div>
+        </div>
+        <div class="reminder-row">
+          <span>Medication Reminders</span>
+          <label class="switch">
+            <input id="reminder-toggle" type="checkbox" onchange="toggleMedicationReminders(this.checked)">
+            <span class="slider"></span>
+          </label>
+        </div>
+        
+        <div id="home-upcoming-container">
+          <div class="timeline-item">
+            <div class="timeline-graphic"><div class="timeline-circle upcoming"></div></div>
+            <div class="dose-card">
+              <div class="dose-card-header"><span class="dose-title">No medications added yet</span><span class="dose-time-badge">UPCOMING</span></div>
+              <div class="dose-desc">Add medication to see upcoming doses here.</div>
+            </div>
+          </div>
+        </div>
+      </div> 
+
+      <div class="fab-container">
+        <div class="fab" onclick="startCameraScan()"><i class="fa-solid fa-camera"></i></div>
+        <div class="fab" onclick="goToAddMedication('home-screen')"><i class="fa-solid fa-plus"></i></div>
+      </div>
+      <div class="bottom-nav">
+        <div class="nav-item active"><i class="fa-solid fa-house"></i><span>Home</span></div>
+        <div class="nav-item" onclick="navTo('history-screen')"><i class="fa-solid fa-clock-rotate-left"></i><span>History</span></div>
+        <div class="nav-item" onclick="navTo('meds-screen')"><i class="fa-solid fa-capsules"></i><span>Meds</span></div>
+        <div class="nav-item" onclick="navTo('settings-screen')"><i class="fa-solid fa-gear"></i><span>Settings</span></div>
+      </div>
+    </div>
+
+    <!-- Review Prescription Screen -->
+    <div id="review-screen" class="screen">
+      <div class="top-header">
+        <div class="top-header-left">
+          <i class="fa-solid fa-arrow-left" onclick="navTo('home-screen')"></i>
+          <h2>Review Prescription</h2>
+        </div>
+      </div>
+      <div class="scrollable-content">
+        <h3 class="review-title">Review Scanned Results</h3>
+        <p class="review-subtitle">Please verify the details extracted from your scan. We detected the following medications.</p>
+
+        <div id="review-scan-list"></div>
+
+        <div id="review-scan-warning" class="scan-warning" style="display:none;">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          <p id="review-scan-warning-text"></p>
+        </div>
+
+        <div class="btn-add-manual" onclick="goToAddMedication('review-screen')">
+          <i class="fa-solid fa-plus"></i> Add another medication manually
+        </div>
+      </div>
+      <div class="bottom-action-bar" style="background: var(--bg-color);">
+        <button class="btn-confirm" onclick="confirmScannedPrescription()">
+          Confirm & Add to Schedule <i class="fa-regular fa-circle-check"></i>
+        </button>
+        <p class="confirm-disclaimer">By confirming, you agree to receive reminders for these medications.</p>
+      </div>
+    </div>
+
+    <!-- Add Medication Screen -->
+    <div id="add-med-screen" class="screen">
+      <div class="top-header blue-arrow">
+        <div class="top-header-left">
+          <i class="fa-solid fa-arrow-left" onclick="goBackFromAddMed()"></i>
+          <h2>Add New Medication</h2>
+        </div>
+      </div>
+      <div class="scrollable-content">
+        <div class="step-section">
+          <div class="step-header"><div class="step-circle">1</div><h3>Medicine Name</h3></div>
+          <div class="input-wrapper">
+            <input id="add-med-name" type="text" placeholder="Type the name on the bottle" style="padding-left: 16px;">
+            <i class="fa-solid fa-prescription-bottle-medical icon-right"></i>
+          </div>
+          <div class="input-hint">Example: Lisinopril or Vitamin D</div>
+        </div>
+
+        <div class="step-section">
+          <div class="step-header"><div class="step-circle">1A</div><h3>Dosage</h3></div>
+          <div class="input-wrapper">
+            <input id="add-med-dosage" type="text" placeholder="e.g. 500mg or 1 tablet" style="padding-left: 16px;">
+            <i class="fa-solid fa-box icon-right"></i>
+          </div>
+          <div class="input-hint">Optional: leave blank to use 1 dose</div>
+        </div>
+
+        <div class="step-section">
+          <div class="step-header"><div class="step-circle">2</div><h3>Time Picker</h3></div>
+          <div class="time-picker-card">
+            <div class="time-column">
+              <i class="fa-solid fa-chevron-up time-arrow" onclick="changeHour(1)"></i>
+              <div class="time-box active" id="hour-display">08</div>
+              <i class="fa-solid fa-chevron-down time-arrow" onclick="changeHour(-1)"></i>
+            </div>
+            <div class="time-colon">:</div>
+            <div class="time-column">
+              <i class="fa-solid fa-chevron-up time-arrow" onclick="changeMinute(1)"></i>
+              <div class="time-box" id="minute-display">30</div>
+              <i class="fa-solid fa-chevron-down time-arrow" onclick="changeMinute(-1)"></i>
+            </div>
+            <div class="ampm-column">
+              <button class="ampm-btn active" id="btn-am" onclick="setAMPM(true)">AM</button>
+              <button class="ampm-btn inactive" id="btn-pm" onclick="setAMPM(false)">PM</button>
+            </div>
+          </div>
+          <button class="btn-secondary" style="margin-top: 10px;" onclick="addCurrentDoseTime()">
+            <i class="fa-solid fa-plus"></i> Add This Dose Time
+          </button>
+        </div>
+
+        <div class="step-section">
+          <div class="step-header"><div class="step-circle">3</div><h3>When</h3></div>
+          <div class="input-wrapper">
+            <select id="add-med-when" style="width:100%;border:none;background:transparent;color:var(--text-dark);font-size:15px;outline:none;padding:4px 0;">
+              <option value="After Meal">After Meal</option>
+              <option value="Before Meal">Before Meal</option>
+              <option value="With Meal">With Meal</option>
+              <option value="Morning">Morning</option>
+              <option value="Afternoon">Afternoon</option>
+              <option value="Evening">Evening</option>
+              <option value="Bedtime">Bedtime</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="step-section">
+          <div class="step-header"><div class="step-circle">4</div><h3>Time of Each Dosage</h3></div>
+          <div id="dose-time-list" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+        </div>
+
+        <div class="step-section">
+          <div class="step-header"><div class="step-circle">5</div><h3>How Often?</h3></div>
+          <div class="freq-grid">
+            <div class="freq-card active" onclick="toggleFreq(this)"><i class="fa-regular fa-calendar"></i><span>Daily</span></div>
+            <div class="freq-card" onclick="toggleFreq(this)"><i class="fa-solid fa-bars-staggered"></i><span>Weekly</span></div>
+          </div>
+        </div>
+
+        <div class="step-section">
+          <div class="step-header"><div class="step-circle">6</div><h3>Start Date</h3></div>
+          <div class="calendar-card">
+            <div class="cal-header">
+              <h4 id="cal-month-year">October 2023</h4>
+              <div class="cal-nav">
+                <i class="fa-solid fa-chevron-left" onclick="changeMonth(-1)"></i>
+                <i class="fa-solid fa-chevron-right" onclick="changeMonth(1)"></i>
+              </div>
+            </div>
+            <div class="cal-grid" id="cal-grid"></div>
+          </div>
+        </div>
+      </div> 
+      <div class="bottom-action-bar">
+        <button class="btn-primary" onclick="saveMedication()">
+          <i class="fa-regular fa-circle-check"></i> Save Medication
+        </button>
+      </div>
+    </div>
+
+    <!-- Medication History Screen -->
+    <div id="history-screen" class="screen">
+      <div class="top-header">
+        <div class="top-header-left">
+          <h2>Medication History</h2>
+        </div>
+        <i class="fa-regular fa-file-lines" style="color: var(--text-dark);" onclick="openHistoryReportModal()"></i>
+      </div>
+
+      <div class="scrollable-content">
+        <div style="background-color: var(--bg-white); border-radius: 16px; padding: 20px; margin-bottom: 24px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="adherence-info">
+              <h3>Weekly Adherence</h3>
+              <div class="percentage" id="history-adherence-percentage">0%</div>
+            </div>
+            <div class="adherence-chart" id="history-adherence-chart">
+              <div class="adherence-inner" id="history-adherence-ratio">0/0</div>
+            </div>
+          </div>
+          <div class="legend-row">
+            <div class="legend-item"><div class="legend-dot blue"></div> Taken (Green)</div>
+            <div class="legend-item"><div class="legend-dot yellow"></div> Partial</div>
+            <div class="legend-item"><div class="legend-dot red"></div> Missed</div>
+          </div>
+        </div>
+
+        <div class="cal-strip-card">
+          <div class="cal-strip-header">
+            <i class="fa-solid fa-chevron-left" onclick="changeHistoryMonth(-1)"></i>
+            <span id="history-month-label"></span>
+            <i class="fa-solid fa-chevron-right" onclick="changeHistoryMonth(1)"></i>
+          </div>
+          <div class="cal-strip-grid" id="history-strip-grid"></div>
+        </div>
+
+        <div class="filter-row">
+          <div class="filter-chip active" data-history-filter="all" onclick="setHistoryFilter('all')"><i class="fa-solid fa-list-ul"></i> All</div>
+          <div class="filter-chip" data-history-filter="taken" onclick="setHistoryFilter('taken')"><i class="fa-regular fa-circle-check blue"></i> Taken</div>
+          <div class="filter-chip" data-history-filter="missed" onclick="setHistoryFilter('missed')"><i class="fa-regular fa-circle-xmark red"></i> Missed</div>
+        </div>
+        
+        <button class="btn-secondary history-report-trigger" onclick="openHistoryReportModal()">
+          <i class="fa-regular fa-file-lines"></i> Generate Report
+        </button>
+
+        <div class="history-date-header">Thursday, Oct 24</div>
+        <div id="history-timeline-container">
+        <div class="timeline-item">
+          <div class="timeline-graphic"><div class="timeline-circle checked"><i class="fa-solid fa-check"></i></div><div class="timeline-line"></div></div>
+          <div class="dose-card">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <div>
+                <div class="dose-time-badge active-text" style="margin-bottom: 4px;">MORNING</div>
+                <div class="dose-title">Lisinopril</div>
+                <div class="dose-desc">10mg &bull; 1 pill</div>
+              </div>
+              <div style="text-align: right;">
+                <div style="font-size: 11px; color: var(--text-light); margin-bottom: 4px;">Scheduled 08:00 AM</div>
+                <div style="color: var(--primary); font-weight: 600; font-size: 12px;">Taken 08:05 AM</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-graphic"><div class="timeline-circle missed"><i class="fa-solid fa-xmark"></i></div><div class="timeline-line"></div></div>
+          <div class="dose-card missed-card">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <div>
+                <div class="dose-time-badge missed-text" style="margin-bottom: 4px;">AFTERNOON</div>
+                <div class="dose-title">Multivitamin</div>
+                <div class="dose-desc">Adult Formula &bull; 2 caps</div>
+              </div>
+              <div style="text-align: right;">
+                <div style="font-size: 11px; color: var(--text-light); margin-bottom: 4px;">Scheduled 01:00 PM</div>
+                <button class="btn-log-now" onclick="markHistoryLogNow(this)" style="margin-top:0;">Log Now</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="timeline-item" style="margin-bottom:40px;">
+          <div class="timeline-graphic"><div class="timeline-circle upcoming"><i class="fa-regular fa-clock"></i></div></div>
+          <div class="dose-card">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <div>
+                <div class="dose-time-badge" style="color:var(--text-light); margin-bottom: 4px;">EVENING</div>
+                <div class="dose-title">Metformin</div>
+                <div class="dose-desc">500mg &bull; 1 pill</div>
+              </div>
+              <div style="text-align: right;">
+                <div style="font-size: 11px; color: var(--text-light); margin-bottom: 4px;">Scheduled 08:00 PM</div>
+                <div style="font-style: italic; font-weight: 600; font-size: 12px; color: var(--text-light);">Upcoming</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        </div>
+      </div>
+
+      <div class="bottom-nav">
+        <div class="nav-item" onclick="navTo('home-screen')"><i class="fa-solid fa-house"></i><span>Home</span></div>
+        <div class="nav-item active"><i class="fa-solid fa-clock-rotate-left"></i><span>History</span></div>
+        <div class="nav-item" onclick="navTo('meds-screen')"><i class="fa-solid fa-capsules"></i><span>Meds</span></div>
+        <div class="nav-item" onclick="navTo('settings-screen')"><i class="fa-solid fa-gear"></i><span>Settings</span></div>
+      </div>
+    </div>
+
+    <!-- My Medications Screen -->
+    <div id="meds-screen" class="screen">
+      <div class="top-header">
+        <div class="top-header-left">
+          <h2>My Medications</h2>
+        </div>
+        <i class="fa-solid fa-plus" onclick="goToAddMedication('meds-screen')" style="color: var(--primary);"></i>
+      </div>
+      
+      <div class="scrollable-content">
+        <p class="meds-header-desc">Manage all your active prescriptions and supplements here.</p>
+        <div id="med-list-container">
+        <div class="med-list-card">
+          <div class="med-list-icon"><i class="fa-solid fa-capsules"></i></div>
+          <div class="med-list-info">
+            <div class="med-list-title">Vitamin C</div>
+            <div class="med-list-desc">1 pill &bull; Daily (Morning)</div>
+          </div>
+          <div class="med-list-action"><i class="fa-solid fa-ellipsis-vertical"></i></div>
+        </div>
+        
+        <div class="med-list-card">
+          <div class="med-list-icon"><i class="fa-solid fa-capsules"></i></div>
+          <div class="med-list-info">
+            <div class="med-list-title">Fish Oil</div>
+            <div class="med-list-desc">1 softgel &bull; Daily (Afternoon)</div>
+          </div>
+          <div class="med-list-action"><i class="fa-solid fa-ellipsis-vertical"></i></div>
+        </div>
+
+        <div class="med-list-card">
+          <div class="med-list-icon"><i class="fa-solid fa-capsules"></i></div>
+          <div class="med-list-info">
+            <div class="med-list-title">Magnesium</div>
+            <div class="med-list-desc">200mg &bull; Daily (Evening)</div>
+          </div>
+          <div class="med-list-action"><i class="fa-solid fa-ellipsis-vertical"></i></div>
+        </div>
+
+        <div class="med-list-card">
+          <div class="med-list-icon"><i class="fa-solid fa-pills"></i></div>
+          <div class="med-list-info">
+            <div class="med-list-title">Amoxicillin</div>
+            <div class="med-list-desc">500mg &bull; Daily (Morning)</div>
+          </div>
+          <div class="med-list-action"><i class="fa-solid fa-ellipsis-vertical"></i></div>
+        </div>
+
+        <div class="med-list-card">
+          <div class="med-list-icon"><i class="fa-solid fa-prescription-bottle-medical"></i></div>
+          <div class="med-list-info">
+            <div class="med-list-title">Lisinopril</div>
+            <div class="med-list-desc">10mg &bull; Daily (Night)</div>
+          </div>
+          <div class="med-list-action"><i class="fa-solid fa-ellipsis-vertical"></i></div>
+        </div>
+        </div>
+      </div>
+
+      <div class="bottom-nav">
+        <div class="nav-item" onclick="navTo('home-screen')"><i class="fa-solid fa-house"></i><span>Home</span></div>
+        <div class="nav-item" onclick="navTo('history-screen')"><i class="fa-solid fa-clock-rotate-left"></i><span>History</span></div>
+        <div class="nav-item active"><i class="fa-solid fa-capsules"></i><span>Meds</span></div>
+        <div class="nav-item" onclick="navTo('settings-screen')"><i class="fa-solid fa-gear"></i><span>Settings</span></div>
+      </div>
+    </div>
+
+    <!-- Settings Screen -->
+    <div id="settings-screen" class="screen">
+      <div class="top-header">
+        <div class="top-header-left">
+          <h2>Settings</h2>
+        </div>
+      </div>
+      
+      <div class="scrollable-content">
+        <div class="settings-profile-header">
+          <div class="settings-avatar"><i class="fa-regular fa-user"></i></div>
+          <div class="settings-name">IryoCare User</div>
+          <div class="settings-email">user@example.com</div>
+        </div>
+
+        <div class="settings-group">
+          <div class="settings-item" onclick="openProfileModal()">
+            <div class="settings-item-left"><i class="fa-regular fa-id-card"></i> Profile Details</div>
+            <i class="fa-solid fa-chevron-right"></i>
+          </div>
+          <div class="settings-item" onclick="openCaregiverModal()">
+            <div class="settings-item-left"><i class="fa-solid fa-user-doctor"></i> Caregiver Details</div>
+            <i class="fa-solid fa-chevron-right"></i>
+          </div>
+        </div>
+
+        <div class="settings-group">
+          <div class="settings-item" onclick="openLanguageModal()">
+            <div class="settings-item-left"><i class="fa-solid fa-globe"></i> Language</div>
+            <i class="fa-solid fa-chevron-right"></i>
+          </div>
+          <div class="settings-item" onclick="openThemeModal()">
+            <div class="settings-item-left"><i class="fa-solid fa-palette"></i> Theme</div>
+            <i class="fa-solid fa-chevron-right"></i>
+          </div>
+        </div>
+
+        <div class="settings-group">
+          <div class="settings-item" onclick="openPrivacyModal()">
+            <div class="settings-item-left"><i class="fa-solid fa-shield-halved"></i> Privacy & Security</div>
+            <i class="fa-solid fa-chevron-right"></i>
+          </div>
+          <div class="settings-item">
+            <div class="settings-item-left"><i class="fa-regular fa-bell"></i> Notifications</div>
+            <i class="fa-solid fa-chevron-right"></i>
+          </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 32px;">
+          <button style="background: none; border: none; color: var(--red-text); font-weight: 700; font-size: 15px; cursor: pointer;" onclick="handleLogout()">Log Out</button>
+        </div>
+      </div>
+
+      <div class="bottom-nav">
+        <div class="nav-item" onclick="navTo('home-screen')"><i class="fa-solid fa-house"></i><span>Home</span></div>
+        <div class="nav-item" onclick="navTo('history-screen')"><i class="fa-solid fa-clock-rotate-left"></i><span>History</span></div>
+        <div class="nav-item" onclick="navTo('meds-screen')"><i class="fa-solid fa-capsules"></i><span>Meds</span></div>
+        <div class="nav-item active"><i class="fa-solid fa-gear"></i><span>Settings</span></div>
+      </div>
+    </div>
+
+    <div id="reminder-toast" class="reminder-toast"></div>
+    <input
+      id="prescription-upload-input"
+      type="file"
+      accept="image/*"
+      capture="environment"
+      onchange="handlePrescriptionUpload(event)"
+      style="display:none;"
+    />
+
+    <div id="camera-overlay" class="camera-overlay">
+      <div class="camera-frame">
+        <video id="camera-video" autoplay playsinline></video>
+      </div>
+      <p>Align your prescription label within the frame. Weâ€™ll capture it automatically.</p>
+      <button class="btn-secondary" onclick="stopCameraScan()">Cancel</button>
+    </div>
+
+    <div id="profile-modal" class="modal-backdrop">
+      <div class="modal-sheet">
+        <div class="modal-header">
+          <h3>Profile Details</h3>
+          <button class="modal-close" onclick="closeProfileModal()">&times;</button>
+        </div>
+        <div class="modal-row">
+          <div class="modal-section-title">Full Name</div>
+          <input id="profile-name-input" type="text" placeholder="Your name">
+        </div>
+        <div class="modal-row">
+          <div class="modal-section-title">Email</div>
+          <input id="profile-email-input" type="email" placeholder="you@example.com">
+        </div>
+        <div class="modal-row">
+          <div class="modal-section-title">Phone (optional)</div>
+          <input id="profile-phone-input" type="tel" placeholder="+1 555 000 0000">
+        </div>
+        <div class="modal-actions">
+          <button class="btn-primary" onclick="saveProfileDetails()">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="caregiver-modal" class="modal-backdrop">
+      <div class="modal-sheet">
+        <div class="modal-header">
+          <h3>Caregiver Details</h3>
+          <button class="modal-close" onclick="closeCaregiverModal()">&times;</button>
+        </div>
+        <div class="modal-row">
+          <div class="modal-section-title">Caregiver Name</div>
+          <input id="caregiver-name-input" type="text" placeholder="Caregiver name">
+        </div>
+        <div class="modal-row">
+          <div class="modal-section-title">Phone Number</div>
+          <input id="caregiver-phone-input" type="tel" placeholder="+1 555 000 0000">
+        </div>
+        <div class="modal-row">
+          <div class="modal-section-title">Relationship</div>
+          <input id="caregiver-relation-input" type="text" placeholder="e.g. Spouse, Daughter">
+        </div>
+        <div class="modal-row">
+          <div class="modal-section-title">Send SMS if dose not taken after</div>
+          <select id="caregiver-delay-input">
+            <option value="15">15 minutes</option>
+            <option value="30">30 minutes</option>
+            <option value="60">1 hour</option>
+            <option value="120">2 hours</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-primary" onclick="saveCaregiverDetails()">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="language-modal" class="modal-backdrop">
+      <div class="modal-sheet">
+        <div class="modal-header">
+          <h3>Language</h3>
+          <button class="modal-close" onclick="closeLanguageModal()">&times;</button>
+        </div>
+        <div class="modal-row">
+          <select id="language-select">
+            <option value="en">English</option>
+            <option value="es">Spanish</option>
+            <option value="fr">French</option>
+            <option value="hi">Hindi</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-primary" onclick="saveLanguage()">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="theme-modal" class="modal-backdrop">
+      <div class="modal-sheet">
+        <div class="modal-header">
+          <h3>Theme</h3>
+          <button class="modal-close" onclick="closeThemeModal()">&times;</button>
+        </div>
+        <div class="modal-row">
+          <select id="theme-select">
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-primary" onclick="saveTheme()">Apply</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="privacy-modal" class="modal-backdrop">
+      <div class="modal-sheet">
+        <div class="modal-header">
+          <h3>Privacy & Security</h3>
+          <button class="modal-close" onclick="closePrivacyModal()">&times;</button>
+        </div>
+        <p style="font-size: 13px; color: var(--text-gray); margin-bottom: 16px;">
+          You can delete your IryoCare account and all locally stored data from this device.
+        </p>
+        <div class="modal-actions">
+          <button class="btn-danger" onclick="handleDeleteAccount()">Delete Account</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="history-report-modal" class="modal-backdrop">
+      <div class="modal-sheet">
+        <div class="modal-header">
+          <h3>Medication Report</h3>
+          <button class="modal-close" onclick="closeHistoryReportModal()">&times;</button>
+        </div>
+        <div id="history-report-content" class="history-report-content"></div>
+        <div class="modal-actions">
+          <button class="btn-primary" onclick="closeHistoryReportModal()">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="medication-edit-modal" class="modal-backdrop">
+      <div class="modal-sheet">
+        <div class="modal-header">
+          <h3>Edit Medication</h3>
+          <button class="modal-close" onclick="closeMedicationEditModal()">&times;</button>
+        </div>
+        <div class="modal-row">
+          <div class="modal-section-title">Medicine Name</div>
+          <input id="edit-med-name-input" type="text" placeholder="Medication name">
+        </div>
+        <div class="modal-row">
+          <div class="modal-section-title">Dosage</div>
+          <input id="edit-med-dosage-input" type="text" placeholder="e.g. 1 tablet">
+        </div>
+        <div class="modal-row">
+          <div class="modal-section-title">Frequency</div>
+          <input id="edit-med-frequency-input" type="text" placeholder="e.g. Daily">
+        </div>
+        <div class="modal-row">
+          <div class="modal-section-title">Time</div>
+          <input id="edit-med-time-input" type="text" placeholder="e.g. 08:00 AM">
+        </div>
+        <div class="modal-row">
+          <div class="modal-section-title">Start Date</div>
+          <input id="edit-med-start-date-input" type="date">
+        </div>
+        <div class="modal-actions">
+          <button class="btn-primary" onclick="saveMedicationEdits()">Save Changes</button>
+          <button class="btn-danger" onclick="removeMedication()" style="margin-top:10px;">Remove Medication</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="medication-remove-modal" class="modal-backdrop">
+      <div class="modal-sheet">
+        <div class="modal-header">
+          <h3>Remove Medication</h3>
+          <button class="modal-close" onclick="closeMedicationRemoveModal()">&times;</button>
+        </div>
+        <p id="medication-remove-text" style="font-size: 14px; color: var(--text-gray); margin-bottom: 16px;">
+          Are you sure you want to remove this medication?
+        </p>
+        <div class="modal-actions">
+          <button class="btn-secondary" onclick="closeMedicationRemoveModal()">Cancel</button>
+          <button class="btn-danger" onclick="confirmRemoveMedication()" style="margin-top:10px;">Remove</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    let previousScreenForMedAdd = 'home-screen';
+    let isAuthenticated = false;
+
+    async function withTimeout(promise, timeoutMs = 10000) {
+      let timerId;
+      const timeoutPromise = new Promise((_, reject) => {
+        timerId = setTimeout(() => reject(new Error('Request timed out')), timeoutMs);
+      });
+      try {
+        return await Promise.race([promise, timeoutPromise]);
+      } finally {
+        clearTimeout(timerId);
+      }
+    }
+
+    /* --- Universal Screen Switcher --- */
+    function navTo(targetScreenId) {
+      const activeScreen = document.querySelector('.screen.active');
+      const publicScreens = ['splash-screen', 'login-screen', 'signup-screen'];
+
+      if (!isAuthenticated && !publicScreens.includes(targetScreenId)) {
+        const loginError = document.getElementById('login-error');
+        if (loginError) {
+          loginError.style.display = 'block';
+          loginError.textContent = 'Please log in to continue.';
+        }
+        if (activeScreen && activeScreen.id !== 'login-screen') {
+          activeScreen.classList.remove('active');
+        }
+        document.getElementById('login-screen').classList.add('active');
+        return;
+      }
+
+      if (activeScreen && activeScreen.id !== targetScreenId) {
+        activeScreen.classList.remove('active');
+        document.getElementById(targetScreenId).classList.add('active');
+      }
+
+      if (targetScreenId === 'meds-screen') {
+        loadMedications();
+      }
+      if (targetScreenId === 'history-screen') {
+        loadHistoryTimeline();
+      }
+    }
+
+    /* --- Splash Screen Logic --- */
+    setTimeout(() => {
+      document.getElementById('splash-screen').classList.remove('active');
+      if (isAuthenticated) {
+        document.getElementById('home-screen').classList.add('active');
+      } else {
+        document.getElementById('login-screen').classList.add('active');
+      }
+    }, 3000); 
+
+    /* --- Simple Auth / Login Logic --- */
+    function clearLoginError() {
+      const errorEl = document.getElementById('login-error');
+      if (errorEl) {
+        errorEl.style.display = 'none';
+        errorEl.textContent = '';
+      }
+    }
+
+    function updateUserProfile(identifier) {
+      if (!identifier) return;
+      const baseName = identifier.includes('@') ? identifier.split('@')[0] : identifier;
+      const displayName = baseName.charAt(0).toUpperCase() + baseName.slice(1);
+
+      const profileNameEls = document.querySelectorAll('.profile-text h2, .settings-name');
+      profileNameEls.forEach(el => el.innerText = displayName);
+
+      const emailEls = document.querySelectorAll('.settings-email');
+      emailEls.forEach(el => el.innerText = identifier);
+    }
+
+    function persistSession(identifier) {
+      try {
+        localStorage.setItem('iryoAuth', JSON.stringify({ identifier }));
+      } catch (e) {
+        // ignore storage errors
+      }
+    }
+
+    async function loadSession() {
+      const client = null;
+      if (!client) return;
+      try {
+        const { data, error } = await withTimeout(client.auth.getSession(), 8000);
+        if (!error && data && data.session && data.session.user) {
+          const user = data.session.user;
+          const providerName =
+            (user.user_metadata && (user.user_metadata.full_name || user.user_metadata.name)) ||
+            user.email ||
+            user.phone ||
+            'user';
+          isAuthenticated = true;
+          updateUserProfile(providerName);
+          persistSession(user.email || user.phone || providerName);
+          loadMedications();
+          loadDailyProgress();
+          loadMissedDoseAlert();
+          return;
+        }
+      } catch (e) {
+        // keep unauthenticated if session cannot be loaded
+      }
+    }
+
+    function getStoredUser() {
+      try {
+        const raw = localStorage.getItem('iryoUser');
+        if (!raw) return null;
+        return JSON.parse(raw);
+      } catch (e) {
+        return null;
+      }
+    }
+
+    async function handleLogin() {
+      const identifierEl = document.getElementById('login-identifier');
+      const passwordEl = document.getElementById('login-password');
+      const errorEl = document.getElementById('login-error');
+
+      const identifier = identifierEl ? identifierEl.value.trim() : '';
+      const password = passwordEl ? passwordEl.value : '';
+      const loginBtn = document.querySelector('#login-screen .btn-primary');
+
+      clearLoginError();
+
+      if (!identifier || !password) {
+        if (errorEl) {
+          errorEl.style.display = 'block';
+          errorEl.textContent = 'Please enter your email/phone and password.';
+        }
+        if (!identifier && identifierEl) identifierEl.focus();
+        else if (passwordEl) passwordEl.focus();
+        return;
+      }
+
+      const client = null;
+      if (!client) {
+        if (errorEl) {
+          errorEl.style.display = 'block';
+          errorEl.textContent = 'Backend is not configured.';
+        }
+        return;
+      }
+
+      if (!identifier.includes('@')) {
+        if (errorEl) {
+          errorEl.style.display = 'block';
+          errorEl.textContent = 'Use your email to log in.';
+        }
+        return;
+      }
+
+      try {
+        if (loginBtn) {
+          loginBtn.disabled = true;
+          loginBtn.style.opacity = '0.7';
+        }
+
+        const { data, error } = await withTimeout(
+          client.auth.signInWithPassword({
+            email: identifier,
+            password
+          }),
+          10000
+        );
+        if (error) {
+          if (errorEl) {
+            errorEl.style.display = 'block';
+            errorEl.textContent = error.message || 'Login failed.';
+          }
+          return;
+        }
+
+        const email = (data && data.user && data.user.email) || identifier;
+        isAuthenticated = true;
+        persistSession(email);
+        updateUserProfile(email);
+        loadMedications();
+        loadDailyProgress();
+        loadMissedDoseAlert();
+        navTo('home-screen');
+      } catch (e) {
+        if (errorEl) {
+          errorEl.style.display = 'block';
+          errorEl.textContent = e && e.message === 'Request timed out'
+            ? 'Backend is not reachable (timeout).'
+            : 'Unable to connect to backend.';
+        }
+      } finally {
+        if (loginBtn) {
+          loginBtn.disabled = false;
+          loginBtn.style.opacity = '1';
+        }
+      }
+    }
+
+    function handleBiometricLogin() {
+      const errorEl = document.getElementById('login-error');
+      if (errorEl) {
+        errorEl.style.display = 'block';
+        errorEl.textContent = 'Biometric demo is disabled in backend mode.';
+      }
+    }
+
+    /* --- Camera Scan Logic --- */
+    let cameraStream = null;
+    function startCameraScan() {
+      const overlay = document.getElementById('camera-overlay');
+      const video = document.getElementById('camera-video');
+      if (!overlay || !video) {
+        navTo('review-screen');
+        return;
+      }
+      overlay.classList.add('active');
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+          .then(stream => {
+            cameraStream = stream;
+            video.srcObject = stream;
+            setTimeout(() => {
+              stopCameraScan();
+              navTo('review-screen');
+            }, 3000);
+          })
+          .catch(() => {
+            stopCameraScan();
+            navTo('review-screen');
+          });
+      } else {
+        navTo('review-screen');
+      }
+    }
+
+    function stopCameraScan() {
+      const overlay = document.getElementById('camera-overlay');
+      const video = document.getElementById('camera-video');
+      if (overlay) overlay.classList.remove('active');
+      if (video) video.srcObject = null;
+      if (cameraStream) {
+        cameraStream.getTracks().forEach(t => t.stop());
+        cameraStream = null;
+      }
+    }
+
+    async function handleSignup() {
+      const nameEl = document.getElementById('signup-name');
+      const emailEl = document.getElementById('signup-email');
+      const pwdEl = document.getElementById('signup-password');
+      const confirmEl = document.getElementById('signup-password-confirm');
+      const errorEl = document.getElementById('signup-error');
+
+      if (errorEl) {
+        errorEl.style.display = 'none';
+        errorEl.textContent = '';
+      }
+
+      const name = nameEl ? nameEl.value.trim() : '';
+      const email = emailEl ? emailEl.value.trim() : '';
+      const pwd = pwdEl ? pwdEl.value : '';
+      const confirmPwd = confirmEl ? confirmEl.value : '';
+
+      if (!name || !email || !pwd || !confirmPwd) {
+        if (errorEl) {
+          errorEl.style.display = 'block';
+          errorEl.textContent = 'Please fill in all fields.';
+        }
+        return;
+      }
+
+      if (pwd.length < 6) {
+        if (errorEl) {
+          errorEl.style.display = 'block';
+          errorEl.textContent = 'Password should be at least 6 characters.';
+        }
+        return;
+      }
+
+      if (pwd !== confirmPwd) {
+        if (errorEl) {
+          errorEl.style.display = 'block';
+          errorEl.textContent = 'Passwords do not match.';
+        }
+        return;
+      }
+
+      const client = null;
+      if (!client) {
+        if (errorEl) {
+          errorEl.style.display = 'block';
+          errorEl.textContent = 'Backend is not configured.';
+        }
+        return;
+      }
+
+      try {
+        const { data, error } = await client.auth.signUp({
+          email,
+          password: pwd,
+          options: { data: { name } }
+        });
+
+        if (error) {
+          if (errorEl) {
+            errorEl.style.display = 'block';
+            errorEl.textContent = error.message || 'Signup failed.';
+          }
+          return;
+        }
+
+        try {
+          localStorage.setItem('iryoUser', JSON.stringify({
+            name,
+            email,
+            provider: 'email'
+          }));
+        } catch (e) {}
+
+        if (data && data.session && data.user) {
+          isAuthenticated = true;
+          persistSession(email);
+          updateUserProfile(email);
+          loadMedications();
+          loadDailyProgress();
+          loadMissedDoseAlert();
+          navTo('home-screen');
+          return;
+        }
+
+        if (errorEl) {
+          errorEl.style.display = 'block';
+          errorEl.textContent = 'Signup successful. Please verify your email, then log in.';
+        }
+        return;
+      } catch (e) {
+        if (errorEl) {
+          errorEl.style.display = 'block';
+          errorEl.textContent = 'Unable to connect to backend.';
+        }
+        return;
+      }
+    }
+
+    async function handleGoogleSignup() {
+      const nameEl = document.getElementById('signup-name');
+      const emailEl = document.getElementById('signup-email');
+      const errorEl = document.getElementById('signup-error');
+      if (errorEl) {
+        errorEl.style.display = 'none';
+        errorEl.textContent = '';
+      }
+
+      const client = null;
+      if (!client) {
+        if (errorEl) {
+          errorEl.style.display = 'block';
+          errorEl.textContent = 'Google sign-in is not configured.';
+        }
+        return;
+      }
+
+      const redirectUrl = `${window.location.origin}${window.location.pathname}`;
+
+      try {
+        const { error } = await client.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            redirectTo: redirectUrl
+          }
+        });
+        if (error && errorEl) {
+          errorEl.style.display = 'block';
+          errorEl.textContent = error.message || 'Google sign-in failed.';
+          return;
+        }
+
+        // OAuth flow redirects away; this path is a safety net.
+        const name = nameEl && nameEl.value.trim() ? nameEl.value.trim() : 'Google User';
+        const email = emailEl && emailEl.value.trim() ? emailEl.value.trim() : '';
+        if (email) {
+          persistSession(email);
+          updateUserProfile(email);
+        } else if (name) {
+          updateUserProfile(name);
+        }
+      } catch (e) {
+        if (errorEl) {
+          errorEl.style.display = 'block';
+          errorEl.textContent = 'Unable to start Google sign-in.';
+        }
+      }
+    }
+
+    /* --- Settings: Profile, Caregiver, Language, Theme, Privacy --- */
+    function openProfileModal() {
+      const modal = document.getElementById('profile-modal');
+      if (!modal) return;
+      const stored = getStoredUser();
+      const nameInput = document.getElementById('profile-name-input');
+      const emailInput = document.getElementById('profile-email-input');
+      const phoneInput = document.getElementById('profile-phone-input');
+      if (stored) {
+        if (nameInput) nameInput.value = stored.name || '';
+        if (emailInput) emailInput.value = stored.email || '';
+        if (phoneInput) phoneInput.value = stored.phone || '';
+      } else {
+        if (nameInput) nameInput.value = '';
+        if (emailInput) emailInput.value = '';
+        if (phoneInput) phoneInput.value = '';
+      }
+      modal.classList.add('active');
+    }
+
+    function closeProfileModal() {
+      const modal = document.getElementById('profile-modal');
+      if (modal) modal.classList.remove('active');
+    }
+
+    function saveProfileDetails() {
+      const nameInput = document.getElementById('profile-name-input');
+      const emailInput = document.getElementById('profile-email-input');
+      const phoneInput = document.getElementById('profile-phone-input');
+      const name = nameInput ? nameInput.value.trim() : '';
+      const email = emailInput ? emailInput.value.trim() : '';
+      const phone = phoneInput ? phoneInput.value.trim() : '';
+      if (!name || !email) {
+        closeProfileModal();
+        return;
+      }
+      const existing = getStoredUser() || {};
+      const updated = { ...existing, name, email, phone };
+      try {
+        localStorage.setItem('iryoUser', JSON.stringify(updated));
+      } catch (e) {}
+      persistSession(email);
+      updateUserProfile(email);
+      closeProfileModal();
+    }
+
+    function openCaregiverModal() {
+      const modal = document.getElementById('caregiver-modal');
+      if (!modal) return;
+      let stored = null;
+      try {
+        const raw = localStorage.getItem('iryoCaregiver');
+        if (raw) stored = JSON.parse(raw);
+      } catch (e) {}
+      const nameInput = document.getElementById('caregiver-name-input');
+      const phoneInput = document.getElementById('caregiver-phone-input');
+      const relationInput = document.getElementById('caregiver-relation-input');
+      const delayInput = document.getElementById('caregiver-delay-input');
+      if (stored) {
+        if (nameInput) nameInput.value = stored.name || '';
+        if (phoneInput) phoneInput.value = stored.phone || '';
+        if (relationInput) relationInput.value = stored.relation || '';
+        if (delayInput && stored.delayMinutes) delayInput.value = String(stored.delayMinutes);
+      }
+      modal.classList.add('active');
+    }
+
+    function closeCaregiverModal() {
+      const modal = document.getElementById('caregiver-modal');
+      if (modal) modal.classList.remove('active');
+    }
+
+    function saveCaregiverDetails() {
+      const nameInput = document.getElementById('caregiver-name-input');
+      const phoneInput = document.getElementById('caregiver-phone-input');
+      const relationInput = document.getElementById('caregiver-relation-input');
+      const delayInput = document.getElementById('caregiver-delay-input');
+      const name = nameInput ? nameInput.value.trim() : '';
+      const phone = phoneInput ? phoneInput.value.trim() : '';
+      const relation = relationInput ? relationInput.value.trim() : '';
+      const delayMinutes = delayInput ? parseInt(delayInput.value, 10) : 30;
+      try {
+        localStorage.setItem('iryoCaregiver', JSON.stringify({ name, phone, relation, delayMinutes }));
+      } catch (e) {}
+      closeCaregiverModal();
+    }
+
+    function openLanguageModal() {
+      const modal = document.getElementById('language-modal');
+      if (!modal) return;
+      const select = document.getElementById('language-select');
+      if (select) {
+        try {
+          const lang = localStorage.getItem('iryoLanguage');
+          if (lang) select.value = lang;
+        } catch (e) {}
+      }
+      modal.classList.add('active');
+    }
+
+    function closeLanguageModal() {
+      const modal = document.getElementById('language-modal');
+      if (modal) modal.classList.remove('active');
+    }
+
+    function saveLanguage() {
+      const select = document.getElementById('language-select');
+      if (select) {
+        try {
+          localStorage.setItem('iryoLanguage', select.value);
+        } catch (e) {}
+      }
+      closeLanguageModal();
+    }
+
+    function openThemeModal() {
+      const modal = document.getElementById('theme-modal');
+      if (!modal) return;
+      const select = document.getElementById('theme-select');
+      if (select) {
+        const current = document.body.classList.contains('dark-theme') ? 'dark' : 'light';
+        select.value = current;
+      }
+      modal.classList.add('active');
+    }
+
+    function closeThemeModal() {
+      const modal = document.getElementById('theme-modal');
+      if (modal) modal.classList.remove('active');
+    }
+
+    function applyTheme(theme) {
+      if (theme === 'dark') {
+        document.body.classList.add('dark-theme');
+      } else {
+        document.body.classList.remove('dark-theme');
+      }
+    }
+
+    function saveTheme() {
+      const select = document.getElementById('theme-select');
+      const value = select ? select.value : 'light';
+      applyTheme(value);
+      try {
+        localStorage.setItem('iryoTheme', value);
+      } catch (e) {}
+      closeThemeModal();
+    }
+
+    function openPrivacyModal() {
+      const modal = document.getElementById('privacy-modal');
+      if (modal) modal.classList.add('active');
+    }
+
+    function closePrivacyModal() {
+      const modal = document.getElementById('privacy-modal');
+      if (modal) modal.classList.remove('active');
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function getHistoryStatusFromCircle(circleEl) {
+      if (!circleEl) return 'Partial';
+      if (circleEl.classList.contains('checked')) return 'Taken';
+      if (circleEl.classList.contains('missed')) return 'Missed';
+      if (circleEl.classList.contains('upcoming')) return 'Upcoming';
+      return 'Partial';
+    }
+
+    function getHistoryReportUserDetails() {
+      const stored = getStoredUser() || {};
+      const uiNameEl = document.querySelector('.settings-name');
+      const uiEmailEl = document.querySelector('.settings-email');
+      const name = stored.name || (uiNameEl ? uiNameEl.textContent.trim() : 'IryoCare User');
+      const email = stored.email || (uiEmailEl ? uiEmailEl.textContent.trim() : 'Not provided');
+      const phone = stored.phone || 'Not provided';
+      return { name, email, phone };
+    }
+
+    function collectMedicationHistoryItems() {
+      const items = [];
+      const rows = document.querySelectorAll('#history-screen .timeline-item');
+      rows.forEach(row => {
+        const statusCircle = row.querySelector('.timeline-circle');
+        const nameEl = row.querySelector('.dose-title');
+        const detailsEl = row.querySelector('.dose-desc');
+        const badgeEl = row.querySelector('.dose-time-badge');
+        const status = getHistoryStatusFromCircle(statusCircle);
+
+        const rightColText = row.textContent.replace(/\s+/g, ' ').trim();
+        let schedule = 'N/A';
+        let logged = '';
+        const scheduleMatch = rightColText.match(/Scheduled\s+([0-9:]+\s?[AP]M)/i);
+        const takenMatch = rightColText.match(/Taken\s+([0-9:]+\s?[AP]M|Just Now)/i);
+        const loggedMatch = rightColText.match(/Logged Late/i);
+        if (scheduleMatch) schedule = scheduleMatch[1].toUpperCase();
+        if (takenMatch) logged = `Taken ${takenMatch[1].toUpperCase()}`;
+        if (loggedMatch && !logged) logged = 'Logged Late';
+        if (status === 'Upcoming') logged = 'Upcoming';
+        if (status === 'Missed' && !logged) logged = 'Not logged';
+
+        items.push({
+          period: badgeEl ? badgeEl.textContent.trim() : 'N/A',
+          medication: nameEl ? nameEl.textContent.trim() : 'Unknown',
+          details: detailsEl ? detailsEl.textContent.trim() : '',
+          status,
+          scheduled: schedule,
+          logged
+        });
+      });
+      return items;
+    }
+
+    function renderHistoryReport() {
+      const reportEl = document.getElementById('history-report-content');
+      if (!reportEl) return;
+      const user = getHistoryReportUserDetails();
+      const selectedDateLabelEl = document.querySelector('#history-screen .history-date-header');
+      const selectedDate = selectedDateLabelEl ? selectedDateLabelEl.textContent.trim() : 'Selected Date';
+      const generatedAt = new Date().toLocaleString();
+      const meds = collectMedicationHistoryItems();
+
+      const summary = { taken: 0, missed: 0, partial: 0, upcoming: 0 };
+      meds.forEach(item => {
+        if (item.status === 'Taken') summary.taken += 1;
+        else if (item.status === 'Missed') summary.missed += 1;
+        else if (item.status === 'Upcoming') summary.upcoming += 1;
+        else summary.partial += 1;
+      });
+
+      const rows = meds.map(item => `
+        <tr>
+          <td>${escapeHtml(item.period)}</td>
+          <td>${escapeHtml(item.medication)}</td>
+          <td>${escapeHtml(item.status)}</td>
+          <td>${escapeHtml(item.scheduled)}</td>
+          <td>${escapeHtml(item.logged || '-')}</td>
+        </tr>
+      `).join('');
+
+      reportEl.innerHTML = `
+        <div class="report-meta">
+          <div><strong>Patient:</strong> ${escapeHtml(user.name)}</div>
+          <div><strong>Email:</strong> ${escapeHtml(user.email)}</div>
+          <div><strong>Phone:</strong> ${escapeHtml(user.phone)}</div>
+          <div><strong>Date:</strong> ${escapeHtml(selectedDate)}</div>
+          <div><strong>Generated:</strong> ${escapeHtml(generatedAt)}</div>
+        </div>
+        <div class="report-summary">
+          <div class="report-pill taken">Taken: ${summary.taken}</div>
+          <div class="report-pill partial">Partial: ${summary.partial}</div>
+          <div class="report-pill missed">Missed: ${summary.missed}</div>
+          <div class="report-pill upcoming">Upcoming: ${summary.upcoming}</div>
+        </div>
+        <div class="report-table-wrap">
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th>Period</th>
+                <th>Medication</th>
+                <th>Status</th>
+                <th>Scheduled</th>
+                <th>Logged</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rows || '<tr><td colspan="5">No medication records found.</td></tr>'}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function openHistoryReportModal() {
+      renderHistoryReport();
+      const modal = document.getElementById('history-report-modal');
+      if (modal) modal.classList.add('active');
+    }
+
+    function closeHistoryReportModal() {
+      const modal = document.getElementById('history-report-modal');
+      if (modal) modal.classList.remove('active');
+    }
+
+    let remindersEnabled = false;
+    let reminderMedicationSource = [];
+    let reminderTimers = [];
+    let medicationCache = [];
+    let editingMedicationId = null;
+    let pendingRemoveMedicationId = null;
+
+    function showReminderToast(message) {
+      const toast = document.getElementById('reminder-toast');
+      if (!toast) return;
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2600);
+    }
+
+    function notifyMedicationReminder(message) {
+      if ('Notification' in window && Notification.permission === 'granted') {
+        try {
+          new Notification('Medication Reminder', { body: message });
+        } catch (e) {
+          // ignore notification failures
+        }
+      }
+      showReminderToast(message);
+    }
+
+    function clearReminderTimers() {
+      reminderTimers.forEach(timerId => clearTimeout(timerId));
+      reminderTimers = [];
+    }
+
+    function scheduleMedicationReminders() {
+      clearReminderTimers();
+      if (!remindersEnabled || !isAuthenticated) return;
+      if (!reminderMedicationSource.length) return;
+
+      let offsetIndex = 0;
+      reminderMedicationSource.forEach(med => {
+        const medName = med && med.name ? med.name : 'your medication';
+        const period = med && med.time ? med.time : 'scheduled time';
+        const delayMs = 8000 + (offsetIndex * 15000); // demo cadence
+        offsetIndex += 1;
+
+        const timerId = setTimeout(() => {
+          if (!isAuthenticated || !remindersEnabled) return;
+          notifyMedicationReminder(`Time to take ${medName} (${period}).`);
+        }, delayMs);
+        reminderTimers.push(timerId);
+      });
+    }
+
+    function toggleMedicationReminders(enabled) {
+      const toggle = document.getElementById('reminder-toggle');
+      if (!isAuthenticated) {
+        if (toggle) toggle.checked = false;
+        remindersEnabled = false;
+        clearReminderTimers();
+        showReminderToast('Please log in to enable reminders.');
+        return;
+      }
+
+      remindersEnabled = !!enabled;
+      try {
+        localStorage.setItem('iryoRemindersEnabled', remindersEnabled ? '1' : '0');
+      } catch (e) {}
+
+      if (!remindersEnabled) {
+        clearReminderTimers();
+        showReminderToast('Medication reminders turned off.');
+        return;
+      }
+
+      if ('Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission().then(() => {
+          scheduleMedicationReminders();
+          showReminderToast('Medication reminders turned on.');
+        }).catch(() => {
+          scheduleMedicationReminders();
+          showReminderToast('Medication reminders turned on.');
+        });
+        return;
+      }
+
+      scheduleMedicationReminders();
+      showReminderToast('Medication reminders turned on.');
+    }
+
+    function loadReminderPreference() {
+      try {
+        remindersEnabled = localStorage.getItem('iryoRemindersEnabled') === '1';
+      } catch (e) {
+        remindersEnabled = false;
+      }
+      const toggle = document.getElementById('reminder-toggle');
+      if (!isAuthenticated) {
+        remindersEnabled = false;
+      }
+      if (toggle) toggle.checked = remindersEnabled;
+      if (remindersEnabled && isAuthenticated) {
+        scheduleMedicationReminders();
+      }
+    }
+
+    function handleDeleteAccount() {
+      try {
+        localStorage.removeItem('iryoUser');
+        localStorage.removeItem('iryoAuth');
+        localStorage.removeItem('iryoCaregiver');
+        localStorage.removeItem('iryoRemindersEnabled');
+      } catch (e) {}
+      closePrivacyModal();
+      handleLogout();
+    }
+
+    async function handleLogout() {
+      isAuthenticated = false;
+      clearReminderTimers();
+      reminderMedicationSource = [];
+      setDailyProgressUI(0, 0, getDailyProgressMessage(0, 0));
+      setMissedDoseAlertUI(null);
+      const client = null;
+      if (client) {
+        try {
+          await client.auth.signOut();
+        } catch (e) {
+          // ignore
+        }
+      }
+      try {
+        localStorage.removeItem('iryoAuth');
+      } catch (e) {
+        // ignore
+      }
+      const identifierEl = document.getElementById('login-identifier');
+      const passwordEl = document.getElementById('login-password');
+      if (identifierEl) identifierEl.value = '';
+      if (passwordEl) passwordEl.value = '';
+      clearLoginError();
+      navTo('login-screen');
+    }
+
+    function togglePasswordVisibility() {
+      const pwd = document.getElementById('login-password');
+      const icon = document.getElementById('toggle-password-visibility');
+      if (!pwd || !icon) return;
+
+      if (pwd.type === 'password') {
+        pwd.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+      } else {
+        pwd.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+      }
+    }
+
+    /* --- Mark As Taken Functionality (Home & History) --- */
+    function getTimeLabelMinutes(timeLabel) {
+      const match = String(timeLabel || '').match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+      if (!match) return -1;
+      let hour = parseInt(match[1], 10);
+      const minute = parseInt(match[2], 10);
+      const ampm = match[3].toUpperCase();
+      if (ampm === 'PM' && hour < 12) hour += 12;
+      if (ampm === 'AM' && hour === 12) hour = 0;
+      return (hour * 60) + minute;
+    }
+
+    function getIsoMinutes(isoText) {
+      const d = new Date(isoText);
+      if (Number.isNaN(d.getTime())) return -1;
+      return (d.getHours() * 60) + d.getMinutes();
+    }
+
+    async function syncHomeDoseStatus(btnElement, status) {
+      const medicationId = btnElement ? btnElement.dataset.medicationId : '';
+      const medicationName = btnElement ? (btnElement.dataset.medicationName || 'Medication') : 'Medication';
+      const doseTime = btnElement ? (btnElement.dataset.doseTime || '') : '';
+      const doseDosage = btnElement ? (btnElement.dataset.doseDosage || '1 dose') : '1 dose';
+      if (!medicationId || !doseTime) return;
+
+      const startDate = new Date();
+      const { startIso, endIso } = getDayBounds(startDate);
+      const todayIsoDate = `${startDate.getFullYear()}-${String(startDate.getMonth() + 1).padStart(2, '0')}-${String(startDate.getDate()).padStart(2, '0')}`;
+
+      if (isAuthenticated && typeof mongoRequest === 'function') {
+        try {
+          const list = await mongoRequest('/doses' + buildMongoQuery({ startIso, endIso }));
+          const targetMinutes = getTimeLabelMinutes(doseTime);
+          const existing = (list.doses || []).find(d =>
+            String(d.medication_id || '') === String(medicationId) &&
+            getIsoMinutes(d.scheduled_at) === targetMinutes
+          );
+
+          if (existing && existing.id) {
+            await mongoRequest('/doses/' + existing.id, {
+              method: 'PUT',
+              body: { status, taken_at: status === 'taken' ? new Date().toISOString() : null }
+            });
+          } else {
+            await mongoRequest('/doses', {
+              method: 'POST',
+              body: {
+                medication_id: medicationId,
+                medication_name: medicationName,
+                dosage: doseDosage || '1 dose',
+                scheduled_at: getScheduledAtIso(todayIsoDate, doseTime),
+                status,
+                taken_at: status === 'taken' ? new Date().toISOString() : null
+              }
+            });
+          }
+        } catch (e) {
+          // fallback local sync
+        }
+      }
+
+      const local = readLocalDoses();
+      const targetMinutes = getTimeLabelMinutes(doseTime);
+      const idx = local.findIndex(d =>
+        String((d.medication_id || d.medicationId || '')) === String(medicationId) &&
+        d.scheduled_at >= startIso &&
+        d.scheduled_at < endIso &&
+        getIsoMinutes(d.scheduled_at) === targetMinutes
+      );
+      if (idx >= 0) {
+        local[idx].status = status;
+        local[idx].taken_at = status === 'taken' ? new Date().toISOString() : null;
+      } else {
+        local.unshift({
+          id: 'local-dose-' + Date.now(),
+          medication_id: medicationId,
+          medication_name: medicationName,
+          dosage: doseDosage || '1 dose',
+          scheduled_at: getScheduledAtIso(todayIsoDate, doseTime),
+          status,
+          taken_at: status === 'taken' ? new Date().toISOString() : null
+        });
+      }
+      writeLocalDoses(local);
+    }
+
+    async function toggleDoseTaken(btnElement) {
+      const card = btnElement.closest('.dose-card');
+      const timelineItem = btnElement.closest('.timeline-item');
+      const circle = timelineItem ? timelineItem.querySelector('.timeline-circle') : null;
+      const badge = card ? card.querySelector('.dose-time-badge') : null;
+      const takenMsg = card ? card.querySelector('.taken-status-msg') : null;
+      const isTaken = btnElement.dataset.taken === 'true';
+
+      if (isTaken) {
+        btnElement.dataset.taken = 'false';
+        btnElement.innerHTML = '<i class="fa-regular fa-circle-check"></i> Mark as Taken';
+        if (circle) {
+          circle.className = 'timeline-circle now';
+          circle.innerHTML = '<i class="fa-regular fa-clock"></i>';
+        }
+        card.classList.add('active');
+        if (badge) badge.classList.add('active-text');
+        if (takenMsg) takenMsg.remove();
+        showReminderToast('Dose marked as not taken.');
+        await syncHomeDoseStatus(btnElement, 'upcoming');
+      } else {
+        btnElement.dataset.taken = 'true';
+        btnElement.innerHTML = '<i class="fa-solid fa-rotate-left"></i> Mark as Untaken';
+        if (circle) {
+          circle.className = 'timeline-circle checked';
+          circle.innerHTML = '<i class="fa-solid fa-check"></i>';
+        }
+        card.classList.remove('active');
+        card.style.borderColor = 'var(--border-color)';
+        card.style.boxShadow = 'none';
+        if (badge) badge.classList.remove('active-text');
+
+        if (!takenMsg) {
+          const msg = document.createElement('div');
+          msg.className = 'taken-status-msg';
+          msg.innerText = 'Taken Just Now';
+          card.appendChild(msg);
+        }
+        showReminderToast('Dose marked as taken.');
+        await syncHomeDoseStatus(btnElement, 'taken');
+      }
+
+      await loadDailyProgress();
+      await loadMissedDoseAlert();
+      if (remindersEnabled) scheduleMedicationReminders();
+    }
+
+    async function markDoseTaken(btnElement) {
+      await toggleDoseTaken(btnElement);
+    }
+
+    async function markHistoryLogNow(btnElement) {
+      const card = btnElement.closest('.dose-card');
+      const timelineItem = btnElement.closest('.timeline-item');
+      const circle = timelineItem.querySelector('.timeline-circle');
+      const doseId = btnElement.dataset.doseId;
+      
+      // Update Circle from Missed to Checked
+      circle.className = 'timeline-circle checked';
+      circle.innerHTML = '<i class="fa-solid fa-check"></i>';
+      
+      // Update Card Styling to Normal
+      card.classList.remove('missed-card');
+      const badge = card.querySelector('.dose-time-badge');
+      if(badge) badge.classList.remove('missed-text');
+
+      // Update right side text content where button was
+      const rightCol = btnElement.parentElement;
+      rightCol.innerHTML = `
+        <div style="font-size: 11px; color: var(--text-light); margin-bottom: 4px;">Logged Late</div>
+        <div style="color: var(--primary); font-weight: 600; font-size: 12px;">Taken Just Now</div>
+      `;
+
+      const client = null;
+      if (client && doseId && isAuthenticated) {
+        try {
+          await client
+            .from('doses')
+            .update({ status: 'taken', taken_at: new Date().toISOString() })
+            .eq('id', doseId);
+        } catch (e) {}
+      } else if (doseId) {
+        const doses = readLocalDoses();
+        const idx = doses.findIndex(d => String(d.id) === String(doseId));
+        if (idx >= 0) {
+          doses[idx].status = 'taken';
+          doses[idx].taken_at = new Date().toISOString();
+          writeLocalDoses(doses);
+        }
+      }
+      await loadHistoryTimeline();
+      await loadDailyProgress();
+      await loadMissedDoseAlert();
+    }
+
+    const today = new Date();
+    let historyTimelineSource = [];
+    let historyActiveFilter = 'all';
+
+    /* --- History Calendar Strip Logic --- */
+    let historyMonth = today.getMonth();
+    let historyYear = today.getFullYear();
+    let historySelectedDate = new Date(today);
+
+    function formatDateKey(dateObj) {
+      const y = dateObj.getFullYear();
+      const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const d = String(dateObj.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+    const historyAdherenceDemo = (() => {
+      // keyed by yyyy-mm-dd: "taken" | "partial" | "missed"
+      const map = {};
+      const offsets = [
+        { offset: -3, status: 'taken' },
+        { offset: -2, status: 'missed' },
+        { offset: -1, status: 'partial' },
+        { offset: 0, status: 'taken' },
+        { offset: 1, status: 'partial' },
+        { offset: 2, status: 'taken' },
+        { offset: 4, status: 'missed' }
+      ];
+
+      offsets.forEach(({ offset, status }) => {
+        const d = new Date(today.getFullYear(), today.getMonth(), today.getDate() + offset);
+        map[formatDateKey(d)] = status;
+      });
+
+      return map;
+    })();
+
+    function formatHistoryMonthLabel() {
+      return `${monthNames[historyMonth]} ${historyYear}`;
+    }
+
+    function getDosePeriodFromDate(dateObj) {
+      const hour = dateObj.getHours();
+      if (hour < 12) return 'MORNING';
+      if (hour < 17) return 'AFTERNOON';
+      return 'EVENING';
+    }
+
+    function formatTimeLabelFromIso(iso) {
+      const d = new Date(iso);
+      return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+    }
+
+    function normalizeDoseStatus(status) {
+      if (!status) return 'upcoming';
+      const s = String(status).toLowerCase();
+      if (s === 'taken' || s === 'missed' || s === 'partial' || s === 'upcoming') return s;
+      return 'upcoming';
+    }
+
+    function updateHistoryFilterUI() {
+      const chips = document.querySelectorAll('#history-screen [data-history-filter]');
+      chips.forEach(chip => {
+        if (chip.getAttribute('data-history-filter') === historyActiveFilter) {
+          chip.classList.add('active');
+        } else {
+          chip.classList.remove('active');
+        }
+      });
+    }
+
+    function setHistoryFilter(filterName) {
+      historyActiveFilter = filterName || 'all';
+      updateHistoryFilterUI();
+      renderHistoryTimeline(historyTimelineSource);
+    }
+
+    function updateHistoryAdherence(items) {
+      const pctEl = document.getElementById('history-adherence-percentage');
+      const ratioEl = document.getElementById('history-adherence-ratio');
+      const chartEl = document.getElementById('history-adherence-chart');
+
+      const list = Array.isArray(items) ? items : [];
+      const taken = list.filter(i => normalizeDoseStatus(i.status) === 'taken').length;
+      const partial = list.filter(i => normalizeDoseStatus(i.status) === 'partial').length;
+      const missed = list.filter(i => normalizeDoseStatus(i.status) === 'missed').length;
+      const actionable = taken + partial + missed;
+      const score = actionable > 0 ? ((taken + (partial * 0.5)) / actionable) * 100 : 0;
+      const percentage = Math.round(score);
+
+      if (pctEl) pctEl.innerText = `${percentage}%`;
+      if (ratioEl) ratioEl.innerText = `${taken}/${actionable || 0}`;
+      if (chartEl) {
+        chartEl.style.background = `conic-gradient(var(--primary) ${percentage}%, #E2E8F0 0)`;
+      }
+    }
+
+    function renderHistoryTimeline(items) {
+      const container = document.getElementById('history-timeline-container');
+      if (!container) return;
+      historyTimelineSource = Array.isArray(items) ? items : [];
+      updateHistoryAdherence(historyTimelineSource);
+
+      const filteredItems = historyActiveFilter === 'all'
+        ? historyTimelineSource
+        : historyTimelineSource.filter(item => normalizeDoseStatus(item.status) === historyActiveFilter);
+
+      if (!filteredItems || !filteredItems.length) {
+        container.innerHTML = `
+          <div class="dose-card" style="margin-bottom:40px;">
+            <div class="dose-title">No ${historyActiveFilter === 'all' ? '' : historyActiveFilter + ' '}doses for this date</div>
+            <div class="dose-desc">Try another filter or change the selected date.</div>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filteredItems.map((item, index) => {
+        const status = normalizeDoseStatus(item.status);
+        const isTaken = status === 'taken';
+        const isMissed = status === 'missed';
+        const isUpcoming = status === 'upcoming';
+        const circleClass = isTaken ? 'checked' : (isMissed ? 'missed' : (isUpcoming ? 'upcoming' : 'checked'));
+        const circleIconHtml = isTaken
+          ? '<i class="fa-solid fa-check"></i>'
+          : (isMissed ? '<i class="fa-solid fa-xmark"></i>' : '<i class="fa-regular fa-clock"></i>');
+        const cardClass = isMissed ? 'dose-card missed-card' : 'dose-card';
+        const badgeClass = isTaken ? 'dose-time-badge active-text' : (isMissed ? 'dose-time-badge missed-text' : 'dose-time-badge');
+        const line = index === filteredItems.length - 1 ? '' : '<div class="timeline-line"></div>';
+        const period = item.period || getDosePeriodFromDate(new Date(item.scheduled_at));
+        const medName = item.medication_name || item.name || 'Medication';
+        const medDesc = item.dosage ? `${item.dosage} \u2022 1 dose` : '1 dose';
+        const scheduled = item.scheduled_at ? formatTimeLabelFromIso(item.scheduled_at) : 'N/A';
+        const loggedText = isTaken
+          ? `<div style="color: var(--primary); font-weight: 600; font-size: 12px;">Taken ${item.taken_at ? formatTimeLabelFromIso(item.taken_at) : 'Just Now'}</div>`
+          : (isMissed
+              ? `<button class="btn-log-now" onclick="markHistoryLogNow(this)" data-dose-id="${escapeHtml(item.id || '')}" style="margin-top:0;">Log Now</button>`
+              : `<div style="font-style: italic; font-weight: 600; font-size: 12px; color: var(--text-light);">Upcoming</div>`);
+
+        return `
+          <div class="timeline-item" style="${index === filteredItems.length - 1 ? 'margin-bottom:40px;' : ''}">
+            <div class="timeline-graphic">
+              <div class="timeline-circle ${circleClass}">${circleIconHtml}</div>
+              ${line}
+            </div>
+            <div class="${cardClass}">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                  <div class="${badgeClass}" style="margin-bottom: 4px;">${escapeHtml(period)}</div>
+                  <div class="dose-title">${escapeHtml(medName)}</div>
+                  <div class="dose-desc">${escapeHtml(medDesc)}</div>
+                </div>
+                <div style="text-align: right;">
+                  <div style="font-size: 11px; color: var(--text-light); margin-bottom: 4px;">Scheduled ${escapeHtml(scheduled)}</div>
+                  ${loggedText}
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function getDayBounds(dateObj) {
+      const start = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate(), 0, 0, 0, 0);
+      const end = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate() + 1, 0, 0, 0, 0);
+      return { startIso: start.toISOString(), endIso: end.toISOString() };
+    }
+
+    function getDemoHistoryItemsForDate(dateObj) {
+      const key = formatDateKey(dateObj);
+      const statusA = historyAdherenceDemo[key] === 'missed' ? 'missed' : 'taken';
+      const statusB = historyAdherenceDemo[key] === 'taken' ? 'partial' : 'missed';
+      return [
+        {
+          id: `demo-a-${key}`,
+          medication_name: 'Lisinopril',
+          dosage: '10mg',
+          scheduled_at: new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate(), 8, 0).toISOString(),
+          taken_at: statusA === 'taken' ? new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate(), 8, 5).toISOString() : null,
+          status: statusA
+        },
+        {
+          id: `demo-b-${key}`,
+          medication_name: 'Multivitamin',
+          dosage: 'Adult Formula',
+          scheduled_at: new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate(), 13, 0).toISOString(),
+          taken_at: null,
+          status: statusB
+        },
+        {
+          id: `demo-c-${key}`,
+          medication_name: 'Metformin',
+          dosage: '500mg',
+          scheduled_at: new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate(), 20, 0).toISOString(),
+          taken_at: null,
+          status: 'upcoming'
+        }
+      ];
+    }
+
+    async function loadHistoryTimeline() {
+      const client = null;
+      const selected = historySelectedDate || new Date();
+
+      if (client && isAuthenticated) {
+        try {
+          const { data: userData } = await client.auth.getUser();
+          const user = userData ? userData.user : null;
+          if (user) {
+            const { startIso, endIso } = getDayBounds(selected);
+            const { data, error } = await client
+              .from('doses')
+              .select('id, status, scheduled_at, taken_at, medication_id, medications(name, dosage)')
+              .eq('user_id', user.id)
+              .gte('scheduled_at', startIso)
+              .lt('scheduled_at', endIso)
+              .order('scheduled_at', { ascending: true });
+            if (!error) {
+              const mapped = (data || []).map(d => ({
+                id: d.id,
+                status: d.status,
+                scheduled_at: d.scheduled_at,
+                taken_at: d.taken_at,
+                medication_name: d.medications && d.medications.name ? d.medications.name : 'Medication',
+                dosage: d.medications && d.medications.dosage ? d.medications.dosage : '1 dose'
+              }));
+              renderHistoryTimeline(mapped);
+              return;
+            }
+          }
+        } catch (e) {
+          // continue fallback
+        }
+      }
+
+      const { startIso, endIso } = getDayBounds(selected);
+      const local = readLocalDoses().filter(d => d.scheduled_at >= startIso && d.scheduled_at < endIso);
+      if (local.length) {
+        renderHistoryTimeline(local);
+        return;
+      }
+      renderHistoryTimeline(getDemoHistoryItemsForDate(selected));
+    }
+
+    function renderHistoryStrip() {
+      const monthLabelEl = document.getElementById('history-month-label');
+      const gridEl = document.getElementById('history-strip-grid');
+      const headerDateEl = document.querySelector('.history-date-header');
+      if (!gridEl) return;
+
+      if (monthLabelEl) {
+        monthLabelEl.innerText = formatHistoryMonthLabel();
+      }
+
+      gridEl.innerHTML = '';
+      const dayNamesRow = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+      dayNamesRow.forEach(d => {
+        const nameEl = document.createElement('div');
+        nameEl.className = 'cal-strip-day';
+        nameEl.innerText = d;
+        gridEl.appendChild(nameEl);
+      });
+
+      const first = new Date(historyYear, historyMonth, 1).getDay();
+      const daysInMonth = new Date(historyYear, historyMonth + 1, 0).getDate();
+
+      for (let i = 0; i < first; i++) {
+        const spacer = document.createElement('div');
+        spacer.className = 'cal-strip-date';
+        spacer.style.color = '#CBD5E1';
+        spacer.innerText = '';
+        gridEl.appendChild(spacer);
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const d = document.createElement('div');
+        d.className = 'cal-strip-date';
+        const dateObj = new Date(historyYear, historyMonth, day);
+        const status = historyAdherenceDemo[formatDateKey(dateObj)];
+        d.innerText = day;
+        d.onclick = () => selectHistoryDate(dateObj);
+        if (status === 'taken') d.classList.add('green');
+        if (status === 'partial') d.classList.add('yellow');
+        if (status === 'missed') d.classList.add('red');
+        if (
+          dateObj.getFullYear() === historySelectedDate.getFullYear() &&
+          dateObj.getMonth() === historySelectedDate.getMonth() &&
+          dateObj.getDate() === historySelectedDate.getDate()
+        ) {
+          d.classList.add('selected');
+        }
+        gridEl.appendChild(d);
+      }
+
+      if (headerDateEl) {
+        headerDateEl.innerText = historySelectedDate.toLocaleDateString(undefined, {
+          weekday: 'long',
+          month: 'short',
+          day: 'numeric'
+        });
+      }
+    }
+
+    function changeHistoryMonth(delta) {
+      historyMonth += delta;
+      if (historyMonth > 11) { historyMonth = 0; historyYear++; }
+      if (historyMonth < 0) { historyMonth = 11; historyYear--; }
+      renderHistoryStrip();
+      loadHistoryTimeline();
+    }
+
+    function selectHistoryDate(dateObj) {
+      historySelectedDate = dateObj;
+      renderHistoryStrip();
+      loadHistoryTimeline();
+    }
+
+    let medicationDoseTimes = [];
+
+    function getMedicationDoseEntries() {
+      if (!Array.isArray(medicationDoseTimes) || !medicationDoseTimes.length) {
+        const defaultDosageEl = document.getElementById('add-med-dosage');
+        const defaultDosage = defaultDosageEl ? String(defaultDosageEl.value || '').trim() : '';
+        return [{ time: getMedicationTimeLabel(), dosage: defaultDosage || '1 dose' }];
+      }
+
+      return medicationDoseTimes.map(item => {
+        if (typeof item === 'string') {
+          return { time: item, dosage: '1 dose' };
+        }
+        return {
+          time: String(item && item.time ? item.time : getMedicationTimeLabel()),
+          dosage: String(item && item.dosage ? item.dosage : '1 dose')
+        };
+      });
+    }
+
+    function getMedicationTimeLabel() {
+      const hour = String(currentHour).padStart(2, '0');
+      const minute = String(currentMinute).padStart(2, '0');
+      return `${hour}:${minute} ${isAM ? 'AM' : 'PM'}`;
+    }
+
+    function getMedicationWhenLabel() {
+      const whenEl = document.getElementById('add-med-when');
+      return whenEl ? String(whenEl.value || '').trim() || 'After Meal' : 'After Meal';
+    }
+
+    function getMedicationTimeLabels() {
+      return getMedicationDoseEntries().map(item => item.time);
+    }
+
+    function getMedicationPrimaryTimeLabel() {
+      const entries = getMedicationDoseEntries();
+      return entries[0] && entries[0].time ? entries[0].time : getMedicationTimeLabel();
+    }
+
+    function getMedicationFrequencyLabel() {
+      const activeFreq = document.querySelector('#add-med-screen .freq-card.active span');
+      const base = activeFreq ? activeFreq.textContent.trim() : 'Daily';
+      const times = getMedicationTimeLabels();
+      const when = getMedicationWhenLabel();
+      return `${base} • ${times.length} dose(s)/day • ${when}`;
+    }
+
+    function renderMedicationDoseTimes() {
+      const listEl = document.getElementById('dose-time-list');
+      if (!listEl) return;
+      medicationDoseTimes = getMedicationDoseEntries();
+      listEl.innerHTML = medicationDoseTimes.map((entry, idx) => `
+        <div style="display:flex;align-items:center;gap:8px;background:var(--light-blue);color:var(--primary);padding:6px 10px;border-radius:999px;font-size:12px;font-weight:600;">
+          <span>${escapeHtml(entry.time)}</span>
+          <input
+            type="text"
+            value="${escapeHtml(entry.dosage || '1 dose')}"
+            placeholder="dosage"
+            onchange="updateMedicationDoseAmount(${idx}, this.value)"
+            style="width:90px;border:1px solid var(--border-color);border-radius:8px;padding:2px 6px;font-size:11px;color:var(--text-dark);background:var(--bg-white);"
+          />
+          <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="removeMedicationDoseTime(${idx})"></i>
+        </div>
+      `).join('');
+    }
+
+    function updateMedicationDoseAmount(index, value) {
+      if (!Array.isArray(medicationDoseTimes) || !medicationDoseTimes[index]) return;
+      medicationDoseTimes[index].dosage = String(value || '').trim() || '1 dose';
+    }
+
+    function addCurrentDoseTime() {
+      const time = getMedicationTimeLabel();
+      const dosageEl = document.getElementById('add-med-dosage');
+      const dosage = dosageEl ? String(dosageEl.value || '').trim() : '';
+      medicationDoseTimes = getMedicationDoseEntries();
+      if (!medicationDoseTimes.some(item => item.time === time)) {
+        medicationDoseTimes.push({ time, dosage: dosage || '1 dose' });
+      }
+      renderMedicationDoseTimes();
+    }
+
+    function removeMedicationDoseTime(index) {
+      medicationDoseTimes = getMedicationDoseEntries();
+      medicationDoseTimes = medicationDoseTimes.filter((_, idx) => idx !== index);
+      renderMedicationDoseTimes();
+    }
+
+    function getMedicationStartDateIso() {
+      const y = selectedDate.getFullYear();
+      const m = String(selectedDate.getMonth() + 1).padStart(2, '0');
+      const d = String(selectedDate.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+    function readLocalMedications() {
+      try {
+        const raw = localStorage.getItem('iryoMedications');
+        if (!raw) return [];
+        const data = JSON.parse(raw);
+        return Array.isArray(data) ? data : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function writeLocalMedications(items) {
+      try {
+        localStorage.setItem('iryoMedications', JSON.stringify(items));
+      } catch (e) {}
+    }
+
+    function normalizeLocalMedicationIds(items) {
+      const list = Array.isArray(items) ? items : [];
+      let changed = false;
+      const normalized = list.map((med, idx) => {
+        if (med && med.id) return med;
+        changed = true;
+        return {
+          ...med,
+          id: `local-med-${med && med.created_at ? med.created_at : `${Date.now()}-${idx}`}`
+        };
+      });
+      return { normalized, changed };
+    }
+
+    function readLocalDoses() {
+      try {
+        const raw = localStorage.getItem('iryoDoses');
+        if (!raw) return [];
+        const data = JSON.parse(raw);
+        return Array.isArray(data) ? data : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function writeLocalDoses(items) {
+      try {
+        localStorage.setItem('iryoDoses', JSON.stringify(items));
+      } catch (e) {}
+    }
+
+    function closeMedicationEditModal() {
+      const modal = document.getElementById('medication-edit-modal');
+      if (modal) modal.classList.remove('active');
+      editingMedicationId = null;
+    }
+
+    function openMedicationRemoveModal() {
+      if (!editingMedicationId) return;
+      const med = medicationCache.find(m => String(m.id) === String(editingMedicationId));
+      const textEl = document.getElementById('medication-remove-text');
+      const modal = document.getElementById('medication-remove-modal');
+      if (!modal || !med) return;
+      pendingRemoveMedicationId = editingMedicationId;
+      if (textEl) {
+        textEl.innerText = `Are you sure you want to remove ${med.name || 'this medication'}?`;
+      }
+      modal.classList.add('active');
+    }
+
+    function closeMedicationRemoveModal() {
+      const modal = document.getElementById('medication-remove-modal');
+      if (modal) modal.classList.remove('active');
+      pendingRemoveMedicationId = null;
+    }
+
+    function openMedicationEditModal(medicationId) {
+      const modal = document.getElementById('medication-edit-modal');
+      if (!modal) return;
+      const med = medicationCache.find(m => String(m.id) === String(medicationId));
+      if (!med) return;
+
+      editingMedicationId = medicationId;
+      const nameInput = document.getElementById('edit-med-name-input');
+      const dosageInput = document.getElementById('edit-med-dosage-input');
+      const frequencyInput = document.getElementById('edit-med-frequency-input');
+      const timeInput = document.getElementById('edit-med-time-input');
+      const startDateInput = document.getElementById('edit-med-start-date-input');
+
+      if (nameInput) nameInput.value = med.name || '';
+      if (dosageInput) dosageInput.value = med.dosage || '';
+      if (frequencyInput) frequencyInput.value = med.frequency || '';
+      if (timeInput) timeInput.value = med.time || '';
+      if (startDateInput) startDateInput.value = med.start_date || '';
+      modal.classList.add('active');
+    }
+
+    async function saveMedicationEdits() {
+      if (!editingMedicationId) return;
+      const nameInput = document.getElementById('edit-med-name-input');
+      const dosageInput = document.getElementById('edit-med-dosage-input');
+      const frequencyInput = document.getElementById('edit-med-frequency-input');
+      const timeInput = document.getElementById('edit-med-time-input');
+      const startDateInput = document.getElementById('edit-med-start-date-input');
+
+      const name = nameInput ? nameInput.value.trim() : '';
+      const dosage = dosageInput ? dosageInput.value.trim() : '';
+      const frequency = frequencyInput ? frequencyInput.value.trim() : '';
+      const time = timeInput ? timeInput.value.trim() : '';
+      const startDate = startDateInput ? startDateInput.value : '';
+
+      if (!name) {
+        alert('Medicine name is required.');
+        return;
+      }
+
+      const client = null;
+      if (client && isAuthenticated) {
+        try {
+          const { error } = await client
+            .from('medications')
+            .update({
+              name,
+              dosage: dosage || '1 dose',
+              frequency: frequency || 'Daily',
+              time: time || '08:00 AM',
+              start_date: startDate || null
+            })
+            .eq('id', editingMedicationId);
+          if (error) {
+            alert(error.message || 'Unable to update medication.');
+            return;
+          }
+        } catch (e) {
+          alert('Unable to connect to backend.');
+          return;
+        }
+      } else {
+        const { normalized, changed } = normalizeLocalMedicationIds(readLocalMedications());
+        if (changed) writeLocalMedications(normalized);
+        const items = normalized;
+        const idx = items.findIndex(m => String(m.id) === String(editingMedicationId));
+        if (idx >= 0) {
+          items[idx] = {
+            ...items[idx],
+            name,
+            dosage: dosage || '1 dose',
+            frequency: frequency || 'Daily',
+            time: time || '08:00 AM',
+            start_date: startDate || items[idx].start_date || ''
+          };
+          writeLocalMedications(items);
+        }
+      }
+
+      closeMedicationEditModal();
+      await loadMedications();
+      await loadHistoryTimeline();
+      await loadDailyProgress();
+      await loadMissedDoseAlert();
+    }
+
+    async function removeMedication() {
+      openMedicationRemoveModal();
+    }
+
+    function removeMedicationLocallyByIdAndName(medicationId, medicationName) {
+      const { normalized, changed } = normalizeLocalMedicationIds(readLocalMedications());
+      if (changed) writeLocalMedications(normalized);
+      const remaining = normalized.filter(m => String(m.id) !== String(medicationId));
+      writeLocalMedications(remaining);
+
+      const doses = readLocalDoses();
+      const cleaned = doses.filter(d => {
+        const doseName = String(d.medication_name || d.name || '').trim().toLowerCase();
+        return doseName !== String(medicationName || '').trim().toLowerCase();
+      });
+      writeLocalDoses(cleaned);
+    }
+
+    async function confirmRemoveMedication() {
+      if (!pendingRemoveMedicationId) return;
+      const med = medicationCache.find(m => String(m.id) === String(pendingRemoveMedicationId));
+      const medName = med && med.name ? med.name : 'this medication';
+
+      const client = null;
+      if (client && isAuthenticated) {
+        try {
+          const { error } = await client
+            .from('medications')
+            .delete()
+            .eq('id', pendingRemoveMedicationId);
+          if (error) {
+            const msg = String(error.message || '');
+            const isNetwork = msg.toLowerCase().includes('fetch') || msg.toLowerCase().includes('network');
+            if (isNetwork) {
+              removeMedicationLocallyByIdAndName(pendingRemoveMedicationId, medName);
+              showReminderToast('Removed locally. Backend is unreachable right now.');
+            } else {
+              alert(error.message || 'Unable to remove medication.');
+              return;
+            }
+          }
+        } catch (e) {
+          removeMedicationLocallyByIdAndName(pendingRemoveMedicationId, medName);
+          showReminderToast('Removed locally. Backend is unreachable right now.');
+        }
+      } else {
+        removeMedicationLocallyByIdAndName(pendingRemoveMedicationId, medName);
+      }
+
+      closeMedicationRemoveModal();
+      closeMedicationEditModal();
+      await loadMedications();
+      await loadHistoryTimeline();
+      await loadDailyProgress();
+      await loadMissedDoseAlert();
+    }
+
+    function renderMedicationList(items) {
+      const container = document.getElementById('med-list-container');
+      if (!container) return;
+      medicationCache = Array.isArray(items)
+        ? items.map((m, idx) => ({
+            ...m,
+            id: m && m.id ? m.id : (m && m.created_at ? `local-med-${m.created_at}` : `local-med-row-${idx}`)
+          }))
+        : [];
+
+      if (!medicationCache.length) {
+        container.innerHTML = `
+          <div class="med-list-card">
+            <div class="med-list-icon"><i class="fa-solid fa-capsules"></i></div>
+            <div class="med-list-info">
+              <div class="med-list-title">No medications yet</div>
+              <div class="med-list-desc">Add your first medication using the + button.</div>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = medicationCache.map(med => `
+        <div class="med-list-card">
+          <div class="med-list-icon"><i class="fa-solid fa-capsules"></i></div>
+          <div class="med-list-info">
+            <div class="med-list-title">${escapeHtml(med.name || 'Medication')}</div>
+            <div class="med-list-desc">${escapeHtml((med.dosage || '1 dose'))} &bull; ${escapeHtml(med.frequency || 'Daily')} (${escapeHtml(med.time || '08:00 AM')})</div>
+          </div>
+          <div class="med-list-action"><i class="fa-solid fa-ellipsis-vertical" onclick="openMedicationEditModal('${String(med.id || '')}')"></i></div>
+        </div>
+      `).join('');
+    }
+
+    function getDoseLabelFromTime(timeText) {
+      const t = String(timeText || '').toUpperCase();
+      if (t.includes('AM')) return 'MORNING';
+      if (t.includes('PM')) {
+        const hourMatch = t.match(/^(\d{1,2}):/);
+        const hour = hourMatch ? parseInt(hourMatch[1], 10) : 0;
+        if (hour >= 5 && hour <= 11) return 'EVENING';
+        return 'AFTERNOON';
+      }
+      return 'UPCOMING';
+    }
+
+    function renderHomeUpcomingFromMedications(items) {
+      const container = document.getElementById('home-upcoming-container');
+      if (!container) return;
+
+      if (!items || !items.length) {
+        container.innerHTML = `
+          <div class="timeline-item">
+            <div class="timeline-graphic"><div class="timeline-circle upcoming"></div></div>
+            <div class="dose-card">
+              <div class="dose-card-header"><span class="dose-title">No medications added yet</span><span class="dose-time-badge">UPCOMING</span></div>
+              <div class="dose-desc">Add medication to see upcoming doses here.</div>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = items.slice(0, 5).map((med, idx, arr) => `
+        <div class="timeline-item">
+          <div class="timeline-graphic">
+            <div class="timeline-circle upcoming"><i class="fa-regular fa-clock"></i></div>
+            ${idx < arr.length - 1 ? '<div class="timeline-line"></div>' : ''}
+          </div>
+          <div class="dose-card">
+            <div class="dose-card-header" style="align-items:flex-start;">
+              <div>
+                <span class="dose-title">${escapeHtml(med.name || 'Medication')}</span>
+                <div class="dose-desc" style="margin-top:6px;">${escapeHtml((med.dosage || '1 dose'))} &bull; ${escapeHtml(med.time || '08:00 AM')}</div>
+              </div>
+              <span class="dose-time-badge">${escapeHtml(getDoseLabelFromTime(med.time))}</span>
+            </div>
+            <button
+              class="btn-log-now"
+              onclick="markDoseTaken(this)"
+              data-taken="false"
+              data-medication-id="${escapeHtml(String(med.id || ''))}"
+              data-medication-name="${escapeHtml(med.name || 'Medication')}"
+              data-dose-time="${escapeHtml(med.time || '08:00 AM')}"
+              data-dose-dosage="${escapeHtml(med.dosage || '1 dose')}"
+              style="margin-top:10px;"
+            >
+              <i class="fa-regular fa-circle-check"></i> Mark as Taken
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function loadMedications() {
+      const client = null;
+      if (client && isAuthenticated) {
+        try {
+          const { data: userData } = await client.auth.getUser();
+          const user = userData ? userData.user : null;
+          if (user) {
+            const { data, error } = await client
+              .from('medications')
+              .select('id, name, dosage, frequency, time, start_date, created_at')
+              .eq('user_id', user.id)
+              .order('created_at', { ascending: false });
+            if (!error) {
+              const meds = data || [];
+              reminderMedicationSource = meds;
+              renderMedicationList(meds);
+              renderHomeUpcomingFromMedications(meds);
+              if (remindersEnabled) scheduleMedicationReminders();
+              return;
+            }
+          }
+        } catch (e) {
+          // fall through to local data
+        }
+      }
+
+      const { normalized, changed } = normalizeLocalMedicationIds(readLocalMedications());
+      if (changed) writeLocalMedications(normalized);
+      reminderMedicationSource = isAuthenticated ? normalized : [];
+      renderMedicationList(normalized);
+      renderHomeUpcomingFromMedications(normalized);
+      if (remindersEnabled) scheduleMedicationReminders();
+    }
+
+    function getScheduledAtIso(startDateIso, timeLabel) {
+      const match = String(timeLabel || '').match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+      if (!match) return new Date(`${startDateIso}T08:00:00`).toISOString();
+      let hour = parseInt(match[1], 10);
+      const minute = parseInt(match[2], 10);
+      const ampm = match[3].toUpperCase();
+      if (ampm === 'PM' && hour < 12) hour += 12;
+      if (ampm === 'AM' && hour === 12) hour = 0;
+      const d = new Date(startDateIso);
+      d.setHours(hour, minute, 0, 0);
+      return d.toISOString();
+    }
+
+    function setDailyProgressUI(taken, total, message) {
+      const textEl = document.getElementById('daily-progress-text');
+      const fillEl = document.getElementById('daily-progress-fill');
+      const msgEl = document.getElementById('daily-progress-msg');
+      const safeTaken = Number.isFinite(taken) ? taken : 0;
+      const safeTotal = Number.isFinite(total) ? total : 0;
+      const pct = safeTotal > 0 ? Math.round((safeTaken / safeTotal) * 100) : 0;
+
+      if (textEl) textEl.innerText = `${safeTaken} of ${safeTotal} taken`;
+      if (fillEl) fillEl.style.width = `${pct}%`;
+      if (msgEl) msgEl.innerText = message || 'Keep going!';
+    }
+
+    function getDailyProgressMessage(taken, total) {
+      if (!isAuthenticated) return "Log in to view today's progress.";
+      if (total === 0) return 'No doses scheduled for today.';
+      const pct = (taken / total) * 100;
+      if (pct >= 100) return "Excellent! You've completed all doses today.";
+      if (pct >= 60) return "Great progress! You're on track.";
+      if (pct > 0) return "Good start. Keep following your schedule.";
+      return 'Your doses are pending for today.';
+    }
+
+    async function loadDailyProgress() {
+      if (!isAuthenticated) {
+        setDailyProgressUI(0, 0, getDailyProgressMessage(0, 0));
+        return;
+      }
+
+      const client = null;
+      if (client) {
+        try {
+          const { data: userData } = await client.auth.getUser();
+          const user = userData ? userData.user : null;
+          if (user) {
+            const { startIso, endIso } = getDayBounds(new Date());
+            const { data, error } = await client
+              .from('doses')
+              .select('status, scheduled_at')
+              .eq('user_id', user.id)
+              .gte('scheduled_at', startIso)
+              .lt('scheduled_at', endIso);
+            if (!error) {
+              const rows = data || [];
+              const total = rows.length;
+              const taken = rows.filter(r => normalizeDoseStatus(r.status) === 'taken').length;
+              setDailyProgressUI(taken, total, getDailyProgressMessage(taken, total));
+              return;
+            }
+          }
+        } catch (e) {
+          // fallback to local
+        }
+      }
+
+      const { startIso, endIso } = getDayBounds(new Date());
+      const localRows = readLocalDoses().filter(d => d.scheduled_at >= startIso && d.scheduled_at < endIso);
+      const total = localRows.length;
+      const taken = localRows.filter(r => normalizeDoseStatus(r.status) === 'taken').length;
+      setDailyProgressUI(taken, total, getDailyProgressMessage(taken, total));
+    }
+
+    function setMissedDoseAlertUI(missedDose) {
+      const alertEl = document.getElementById('home-missed-alert');
+      const titleEl = document.getElementById('home-missed-alert-title');
+      const textEl = document.getElementById('home-missed-alert-text');
+      if (!alertEl || !titleEl || !textEl) return;
+
+      if (!isAuthenticated || !missedDose || normalizeDoseStatus(missedDose.status) !== 'missed') {
+        alertEl.style.display = 'none';
+        return;
+      }
+
+      const medName =
+        missedDose.medication_name ||
+        missedDose.name ||
+        'your medication';
+      const timeLabel = missedDose.scheduled_at
+        ? formatTimeLabelFromIso(missedDose.scheduled_at)
+        : 'scheduled time';
+
+      titleEl.innerText = 'Missed Dose Alert';
+      textEl.innerText = `You missed 1 dose of ${medName} at ${timeLabel}.`;
+      alertEl.style.display = 'flex';
+    }
+
+    async function loadMissedDoseAlert() {
+      if (!isAuthenticated) {
+        setMissedDoseAlertUI(null);
+        return;
+      }
+
+      const client = null;
+      if (client) {
+        try {
+          const { data: userData } = await client.auth.getUser();
+          const user = userData ? userData.user : null;
+          if (user) {
+            const { startIso, endIso } = getDayBounds(new Date());
+            const { data, error } = await client
+              .from('doses')
+              .select('status, scheduled_at, medications(name)')
+              .eq('user_id', user.id)
+              .eq('status', 'missed')
+              .gte('scheduled_at', startIso)
+              .lt('scheduled_at', endIso)
+              .order('scheduled_at', { ascending: false })
+              .limit(1);
+            if (!error) {
+              const row = (data && data[0]) || null;
+              if (row) {
+                setMissedDoseAlertUI({
+                  status: row.status,
+                  scheduled_at: row.scheduled_at,
+                  medication_name: row.medications && row.medications.name ? row.medications.name : 'Medication'
+                });
+              } else {
+                setMissedDoseAlertUI(null);
+              }
+              return;
+            }
+          }
+        } catch (e) {
+          // fallback to local data
+        }
+      }
+
+      const { startIso, endIso } = getDayBounds(new Date());
+      const localMissed = readLocalDoses()
+        .filter(d => d.scheduled_at >= startIso && d.scheduled_at < endIso)
+        .filter(d => normalizeDoseStatus(d.status) === 'missed')
+        .sort((a, b) => new Date(b.scheduled_at) - new Date(a.scheduled_at));
+      setMissedDoseAlertUI(localMissed[0] || null);
+    }
+
+    async function saveMedication() {
+      const nameInput = document.getElementById('add-med-name');
+      const name = nameInput ? nameInput.value.trim() : '';
+      if (!name) {
+        alert('Please enter medicine name.');
+        return;
+      }
+
+      const payload = {
+        name,
+        dosage: '1 dose',
+        frequency: getMedicationFrequencyLabel(),
+        time: getMedicationTimeLabel(),
+        start_date: getMedicationStartDateIso()
+      };
+
+      const client = null;
+      if (client && isAuthenticated) {
+        try {
+          const { data: userData } = await client.auth.getUser();
+          const user = userData ? userData.user : null;
+          if (user) {
+            const { data: medData, error } = await client.from('medications').insert({
+              user_id: user.id,
+              name: payload.name,
+              dosage: payload.dosage,
+              frequency: payload.frequency,
+              time: payload.time,
+              start_date: payload.start_date
+            }).select('id').single();
+            if (error) {
+              alert(error.message || 'Unable to save medication.');
+              return;
+            }
+            if (medData && medData.id) {
+              const scheduledAt = getScheduledAtIso(payload.start_date, payload.time);
+              await client.from('doses').insert({
+                medication_id: medData.id,
+                user_id: user.id,
+                scheduled_at: scheduledAt,
+                status: 'upcoming'
+              });
+            }
+          }
+        } catch (e) {
+          alert('Unable to connect to backend.');
+          return;
+        }
+      } else {
+        const items = readLocalMedications();
+        items.unshift({ id: `local-med-${Date.now()}`, ...payload, created_at: new Date().toISOString() });
+        writeLocalMedications(items);
+        const doseItems = readLocalDoses();
+        doseItems.unshift({
+          id: `local-dose-${Date.now()}`,
+          medication_name: payload.name,
+          dosage: payload.dosage,
+          scheduled_at: getScheduledAtIso(payload.start_date, payload.time),
+          status: 'upcoming'
+        });
+        writeLocalDoses(doseItems);
+      }
+
+      if (nameInput) nameInput.value = '';
+      await loadMedications();
+      await loadHistoryTimeline();
+      await loadDailyProgress();
+      await loadMissedDoseAlert();
+      goBackFromAddMed();
+    }
+
+    /* --- Add Medication Routing --- */
+    function goToAddMedication(fromScreenId) {
+      previousScreenForMedAdd = fromScreenId;
+      navTo('add-med-screen');
+      medicationDoseTimes = [{ time: getMedicationTimeLabel(), dosage: '1 dose' }];
+      renderMedicationDoseTimes();
+      initCalendar(); 
+    }
+
+    function goBackFromAddMed() {
+      navTo(previousScreenForMedAdd);
+    }
+
+    /* --- Time Picker Logic --- */
+    let currentHour = 8; let currentMinute = 30; let isAM = true;
+    function updateTimeDisplay() {
+      document.getElementById('hour-display').innerText = currentHour.toString().padStart(2, '0');
+      document.getElementById('minute-display').innerText = currentMinute.toString().padStart(2, '0');
+      document.getElementById('btn-am').className = isAM ? 'ampm-btn active' : 'ampm-btn inactive';
+      document.getElementById('btn-pm').className = !isAM ? 'ampm-btn active' : 'ampm-btn inactive';
+    }
+    function changeHour(delta) { currentHour += delta; if(currentHour > 12) currentHour = 1; if(currentHour < 1) currentHour = 12; updateTimeDisplay(); }
+    function changeMinute(delta) { currentMinute += delta; if(currentMinute > 59) currentMinute = 0; if(currentMinute < 0) currentMinute = 59; updateTimeDisplay(); }
+    function setAMPM(am) { isAM = am; updateTimeDisplay(); }
+
+    /* Frequency Toggle */
+    function toggleFreq(clickedElement) {
+      const cards = document.querySelectorAll('.freq-card');
+      cards.forEach(card => card.classList.remove('active'));
+      clickedElement.classList.add('active');
+    }
+
+    /* --- Custom Calendar Logic (Add Med Screen) --- */
+    let viewMonth = today.getMonth(); let viewYear = today.getFullYear(); let selectedDate = new Date(today); 
+    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    const daysOfWeek = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+
+    function initCalendar() { viewMonth = selectedDate.getMonth(); viewYear = selectedDate.getFullYear(); renderCalendar(); }
+
+    function renderCalendar() {
+      const monthYearEl = document.getElementById('cal-month-year');
+      const gridEl = document.getElementById('cal-grid');
+      if (!monthYearEl || !gridEl) return;
+
+      monthYearEl.innerText = `${monthNames[viewMonth]} ${viewYear}`;
+      const firstDayOfMonth = new Date(viewYear, viewMonth, 1).getDay();
+      const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+      const daysInPrevMonth = new Date(viewYear, viewMonth, 0).getDate();
+      let html = '';
+      
+      daysOfWeek.forEach(day => { html += `<div class="cal-day-name">${day}</div>`; });
+      for (let i = 0; i < firstDayOfMonth; i++) {
+        html += `<div class="cal-date past">${daysInPrevMonth - firstDayOfMonth + i + 1}</div>`;
+      }
+      for (let i = 1; i <= daysInMonth; i++) {
+        let isSelected = (i === selectedDate.getDate() && viewMonth === selectedDate.getMonth() && viewYear === selectedDate.getFullYear());
+        html += `<div class="cal-date ${isSelected ? 'active' : ''}" onclick="selectDate(${i})">${i}</div>`;
+      }
+      let totalCellsRendered = firstDayOfMonth + daysInMonth;
+      for (let i = 1; i <= (7 - (totalCellsRendered % 7)) % 7; i++) {
+        html += `<div class="cal-date past">${i}</div>`;
+      }
+      gridEl.innerHTML = html;
+    }
+    function changeMonth(delta) {
+      viewMonth += delta;
+      if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+      if (viewMonth < 0) { viewMonth = 11; viewYear--; }
+      renderCalendar();
+    }
+    function selectDate(day) { selectedDate = new Date(viewYear, viewMonth, day); renderCalendar(); }
+    document.addEventListener("DOMContentLoaded", async () => {
+      await loadSession();
+      await loadMedications();
+      initCalendar();
+      loadReminderPreference();
+      const toggleIcon = document.getElementById('toggle-password-visibility');
+      if (toggleIcon) {
+        toggleIcon.addEventListener('click', togglePasswordVisibility);
+      }
+      try {
+        const theme = localStorage.getItem('iryoTheme');
+        if (theme) applyTheme(theme);
+      } catch (e) {}
+      renderHistoryStrip();
+      await loadHistoryTimeline();
+      await loadDailyProgress();
+      await loadMissedDoseAlert();
+    });
+
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <script>
+    // MongoDB backend overrides
+    const API_BASE_URL = 'http://10.237.192.114:4000/api';
+
+    function getMongoToken() {
+      try { return localStorage.getItem('iryoToken') || ''; } catch (e) { return ''; }
+    }
+
+    function setMongoSession(user, token) {
+      if (!user || !token) return;
+      isAuthenticated = true;
+      updateUserProfile(user.email || user.name || 'User');
+      persistSession(user.email || user.name || 'user');
+      try {
+        localStorage.setItem('iryoToken', token);
+        localStorage.setItem('iryoUser', JSON.stringify({
+          name: user.name || '',
+          email: user.email || '',
+          provider: 'email'
+        }));
+      } catch (e) {}
+    }
+
+    function clearMongoSession() {
+      isAuthenticated = false;
+      try { localStorage.removeItem('iryoToken'); } catch (e) {}
+    }
+
+    function buildMongoQuery(params) {
+      const q = new URLSearchParams();
+      Object.keys(params || {}).forEach((k) => {
+        const v = params[k];
+        if (v !== undefined && v !== null && v !== '') q.set(k, String(v));
+      });
+      const text = q.toString();
+      return text ? '?' + text : '';
+    }
+
+    async function mongoRequest(path, options = {}, timeoutMs = 10000) {
+      const token = getMongoToken();
+      const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
+      if (token) headers.Authorization = 'Bearer ' + token;
+
+      const fetchPromise = fetch(API_BASE_URL + path, {
+        method: options.method || 'GET',
+        headers,
+        body: options.body ? JSON.stringify(options.body) : undefined
+      });
+
+      const response = await withTimeout(fetchPromise, timeoutMs);
+      let data = null;
+      try { data = await response.json(); } catch (e) {}
+      if (!response.ok) throw new Error((data && data.error) ? data.error : ('Request failed (' + response.status + ')'));
+      return data || {};
+    }
+
+    loadSession = async function () {
+      const token = getMongoToken();
+      if (!token) return;
+      try {
+        const data = await mongoRequest('/auth/me');
+        if (data && data.user) {
+          setMongoSession(data.user, token);
+          await loadMedications();
+          await loadDailyProgress();
+          await loadMissedDoseAlert();
+        }
+      } catch (e) {
+        clearMongoSession();
+      }
+    };
+
+    handleLogin = async function () {
+      const identifierEl = document.getElementById('login-identifier');
+      const passwordEl = document.getElementById('login-password');
+      const errorEl = document.getElementById('login-error');
+      const identifier = identifierEl ? identifierEl.value.trim() : '';
+      const password = passwordEl ? passwordEl.value : '';
+      const loginBtn = document.querySelector('#login-screen .btn-primary');
+
+      clearLoginError();
+      if (!identifier || !password) {
+        if (errorEl) { errorEl.style.display = 'block'; errorEl.textContent = 'Please enter your email and password.'; }
+        return;
+      }
+      if (!identifier.includes('@')) {
+        if (errorEl) { errorEl.style.display = 'block'; errorEl.textContent = 'Use your email to log in.'; }
+        return;
+      }
+
+      try {
+        if (loginBtn) { loginBtn.disabled = true; loginBtn.style.opacity = '0.7'; }
+        const data = await mongoRequest('/auth/login', { method: 'POST', body: { email: identifier, password } });
+        setMongoSession(data.user, data.token);
+        await loadMedications();
+        await loadDailyProgress();
+        await loadMissedDoseAlert();
+        navTo('home-screen');
+      } catch (e) {
+        if (errorEl) {
+          errorEl.style.display = 'block';
+          errorEl.textContent = (e && e.message) ? e.message : 'Login failed. Check credentials or backend connection.';
+        }
+      } finally {
+        if (loginBtn) { loginBtn.disabled = false; loginBtn.style.opacity = '1'; }
+      }
+    };
+
+    handleBiometricLogin = function () {
+      const errorEl = document.getElementById('login-error');
+      if (errorEl) { errorEl.style.display = 'block'; errorEl.textContent = 'Biometric login is disabled in MongoDB mode.'; }
+    };
+
+    handleSignup = async function () {
+      const nameEl = document.getElementById('signup-name');
+      const emailEl = document.getElementById('signup-email');
+      const pwdEl = document.getElementById('signup-password');
+      const confirmEl = document.getElementById('signup-password-confirm');
+      const errorEl = document.getElementById('signup-error');
+
+      if (errorEl) { errorEl.style.display = 'none'; errorEl.textContent = ''; }
+
+      const name = nameEl ? nameEl.value.trim() : '';
+      const email = emailEl ? emailEl.value.trim() : '';
+      const pwd = pwdEl ? pwdEl.value : '';
+      const confirmPwd = confirmEl ? confirmEl.value : '';
+
+      if (!name || !email || !pwd || !confirmPwd) {
+        if (errorEl) { errorEl.style.display = 'block'; errorEl.textContent = 'Please fill in all fields.'; }
+        return;
+      }
+      if (pwd.length < 6) {
+        if (errorEl) { errorEl.style.display = 'block'; errorEl.textContent = 'Password should be at least 6 characters.'; }
+        return;
+      }
+      if (pwd !== confirmPwd) {
+        if (errorEl) { errorEl.style.display = 'block'; errorEl.textContent = 'Passwords do not match.'; }
+        return;
+      }
+
+      try {
+        const data = await mongoRequest('/auth/signup', { method: 'POST', body: { name, email, password: pwd } });
+        setMongoSession(data.user, data.token);
+        await loadMedications();
+        await loadDailyProgress();
+        await loadMissedDoseAlert();
+        navTo('home-screen');
+      } catch (e) {
+        if (errorEl) { errorEl.style.display = 'block'; errorEl.textContent = (e && e.message) ? e.message : 'Signup failed.'; }
+      }
+    };
+
+    handleGoogleSignup = async function () {
+      const errorEl = document.getElementById('signup-error');
+      if (errorEl) {
+        errorEl.style.display = 'block';
+        errorEl.textContent = 'Google sign-in is not configured for MongoDB backend.';
+      }
+    };
+
+    handleLogout = async function () {
+      clearMongoSession();
+      clearReminderTimers();
+      reminderMedicationSource = [];
+      setDailyProgressUI(0, 0, getDailyProgressMessage(0, 0));
+      setMissedDoseAlertUI(null);
+      try { localStorage.removeItem('iryoAuth'); } catch (e) {}
+      const identifierEl = document.getElementById('login-identifier');
+      const passwordEl = document.getElementById('login-password');
+      if (identifierEl) identifierEl.value = '';
+      if (passwordEl) passwordEl.value = '';
+      clearLoginError();
+      navTo('login-screen');
+    };
+
+    markHistoryLogNow = async function (btnElement) {
+      const card = btnElement.closest('.dose-card');
+      const timelineItem = btnElement.closest('.timeline-item');
+      const circle = timelineItem.querySelector('.timeline-circle');
+      const doseId = btnElement.dataset.doseId;
+
+      circle.className = 'timeline-circle checked';
+      circle.innerHTML = '<i class="fa-solid fa-check"></i>';
+      card.classList.remove('missed-card');
+      const badge = card.querySelector('.dose-time-badge');
+      if (badge) badge.classList.remove('missed-text');
+
+      const rightCol = btnElement.parentElement;
+      rightCol.innerHTML = '<div style="font-size: 11px; color: var(--text-light); margin-bottom: 4px;">Logged Late</div><div style="color: var(--primary); font-weight: 600; font-size: 12px;">Taken Just Now</div>';
+
+      if (doseId && isAuthenticated) {
+        try {
+          await mongoRequest('/doses/' + doseId, {
+            method: 'PUT',
+            body: { status: 'taken', taken_at: new Date().toISOString() }
+          });
+        } catch (e) {}
+      } else if (doseId) {
+        const doses = readLocalDoses();
+        const idx = doses.findIndex(d => String(d.id) === String(doseId));
+        if (idx >= 0) {
+          doses[idx].status = 'taken';
+          doses[idx].taken_at = new Date().toISOString();
+          writeLocalDoses(doses);
+        }
+      }
+
+      await loadHistoryTimeline();
+      await loadDailyProgress();
+      await loadMissedDoseAlert();
+    };
+
+    loadHistoryTimeline = async function () {
+      const selected = historySelectedDate || new Date();
+      if (isAuthenticated) {
+        try {
+          const bounds = getDayBounds(selected);
+          const data = await mongoRequest('/doses' + buildMongoQuery({ startIso: bounds.startIso, endIso: bounds.endIso }));
+          const mapped = (data.doses || []).map((d) => ({
+            id: d.id,
+            status: d.status,
+            scheduled_at: d.scheduled_at,
+            taken_at: d.taken_at,
+            medication_name: d.medication_name || 'Medication',
+            dosage: d.dosage || '1 dose'
+          }));
+          renderHistoryTimeline(mapped);
+          return;
+        } catch (e) {}
+      }
+
+      const bounds = getDayBounds(selected);
+      const local = readLocalDoses().filter(d => d.scheduled_at >= bounds.startIso && d.scheduled_at < bounds.endIso);
+      if (local.length) { renderHistoryTimeline(local); return; }
+      renderHistoryTimeline(getDemoHistoryItemsForDate(selected));
+    };
+
+    saveMedicationEdits = async function () {
+      if (!editingMedicationId) return;
+      const nameInput = document.getElementById('edit-med-name-input');
+      const dosageInput = document.getElementById('edit-med-dosage-input');
+      const frequencyInput = document.getElementById('edit-med-frequency-input');
+      const timeInput = document.getElementById('edit-med-time-input');
+      const startDateInput = document.getElementById('edit-med-start-date-input');
+
+      const name = nameInput ? nameInput.value.trim() : '';
+      const dosage = dosageInput ? dosageInput.value.trim() : '';
+      const frequency = frequencyInput ? frequencyInput.value.trim() : '';
+      const time = timeInput ? timeInput.value.trim() : '';
+      const startDate = startDateInput ? startDateInput.value : '';
+
+      if (!name) { alert('Medicine name is required.'); return; }
+
+      if (isAuthenticated) {
+        try {
+          await mongoRequest('/medications/' + editingMedicationId, {
+            method: 'PUT',
+            body: {
+              name,
+              dosage: dosage || '1 dose',
+              frequency: frequency || 'Daily',
+              time: time || '08:00 AM',
+              start_date: startDate || ''
+            }
+          });
+        } catch (e) {
+          alert((e && e.message) ? e.message : 'Unable to update medication.');
+          return;
+        }
+      } else {
+        const normalizedResult = normalizeLocalMedicationIds(readLocalMedications());
+        if (normalizedResult.changed) writeLocalMedications(normalizedResult.normalized);
+        const items = normalizedResult.normalized;
+        const idx = items.findIndex(m => String(m.id) === String(editingMedicationId));
+        if (idx >= 0) {
+          items[idx] = {
+            ...items[idx],
+            name,
+            dosage: dosage || '1 dose',
+            frequency: frequency || 'Daily',
+            time: time || '08:00 AM',
+            start_date: startDate || items[idx].start_date || ''
+          };
+          writeLocalMedications(items);
+        }
+      }
+
+      closeMedicationEditModal();
+      await loadMedications();
+      await loadHistoryTimeline();
+      await loadDailyProgress();
+      await loadMissedDoseAlert();
+    };
+
+    confirmRemoveMedication = async function () {
+      if (!pendingRemoveMedicationId) return;
+      const med = medicationCache.find(m => String(m.id) === String(pendingRemoveMedicationId));
+      const medName = med && med.name ? med.name : 'this medication';
+
+      if (isAuthenticated) {
+        try {
+          await mongoRequest('/medications/' + pendingRemoveMedicationId, { method: 'DELETE' });
+        } catch (e) {
+          const msg = String((e && e.message) || '');
+          const isNetwork = msg.toLowerCase().includes('fetch') || msg.toLowerCase().includes('network');
+          if (isNetwork) {
+            removeMedicationLocallyByIdAndName(pendingRemoveMedicationId, medName);
+            showReminderToast('Removed locally. Backend is unreachable right now.');
+          } else {
+            alert((e && e.message) ? e.message : 'Unable to remove medication.');
+            return;
+          }
+        }
+      } else {
+        removeMedicationLocallyByIdAndName(pendingRemoveMedicationId, medName);
+      }
+
+      closeMedicationRemoveModal();
+      closeMedicationEditModal();
+      await loadMedications();
+      await loadHistoryTimeline();
+      await loadDailyProgress();
+      await loadMissedDoseAlert();
+    };
+
+    loadMedications = async function () {
+      if (isAuthenticated) {
+        try {
+          const data = await mongoRequest('/medications');
+          const meds = data.medications || [];
+          reminderMedicationSource = meds;
+          renderMedicationList(meds);
+          renderHomeUpcomingFromMedications(meds);
+          if (remindersEnabled) scheduleMedicationReminders();
+          return;
+        } catch (e) {}
+      }
+
+      const normalizedResult = normalizeLocalMedicationIds(readLocalMedications());
+      if (normalizedResult.changed) writeLocalMedications(normalizedResult.normalized);
+      reminderMedicationSource = isAuthenticated ? normalizedResult.normalized : [];
+      renderMedicationList(normalizedResult.normalized);
+      renderHomeUpcomingFromMedications(normalizedResult.normalized);
+      if (remindersEnabled) scheduleMedicationReminders();
+    };
+
+    loadDailyProgress = async function () {
+      if (!isAuthenticated) {
+        setDailyProgressUI(0, 0, getDailyProgressMessage(0, 0));
+        return;
+      }
+
+      try {
+        const bounds = getDayBounds(new Date());
+        const data = await mongoRequest('/doses' + buildMongoQuery({ startIso: bounds.startIso, endIso: bounds.endIso }));
+        const rows = data.doses || [];
+        const total = rows.length;
+        const taken = rows.filter(r => normalizeDoseStatus(r.status) === 'taken').length;
+        setDailyProgressUI(taken, total, getDailyProgressMessage(taken, total));
+        return;
+      } catch (e) {}
+
+      const bounds = getDayBounds(new Date());
+      const localRows = readLocalDoses().filter(d => d.scheduled_at >= bounds.startIso && d.scheduled_at < bounds.endIso);
+      const total = localRows.length;
+      const taken = localRows.filter(r => normalizeDoseStatus(r.status) === 'taken').length;
+      setDailyProgressUI(taken, total, getDailyProgressMessage(taken, total));
+    };
+
+    loadMissedDoseAlert = async function () {
+      if (!isAuthenticated) {
+        setMissedDoseAlertUI(null);
+        return;
+      }
+
+      try {
+        const bounds = getDayBounds(new Date());
+        const data = await mongoRequest('/doses' + buildMongoQuery({ startIso: bounds.startIso, endIso: bounds.endIso, status: 'missed' }));
+        const list = (data.doses || []).sort((a, b) => new Date(b.scheduled_at) - new Date(a.scheduled_at));
+        setMissedDoseAlertUI(list[0] || null);
+        return;
+      } catch (e) {}
+
+      const bounds = getDayBounds(new Date());
+      const localMissed = readLocalDoses()
+        .filter(d => d.scheduled_at >= bounds.startIso && d.scheduled_at < bounds.endIso)
+        .filter(d => normalizeDoseStatus(d.status) === 'missed')
+        .sort((a, b) => new Date(b.scheduled_at) - new Date(a.scheduled_at));
+      setMissedDoseAlertUI(localMissed[0] || null);
+    };
+
+    saveMedication = async function () {
+      const nameInput = document.getElementById('add-med-name');
+      const dosageInput = document.getElementById('add-med-dosage');
+      const name = nameInput ? nameInput.value.trim() : '';
+      const dosage = dosageInput ? dosageInput.value.trim() : '';
+      if (!name) { alert('Please enter medicine name.'); return; }
+      const doseEntries = getMedicationDoseEntries();
+      const primaryDose = doseEntries[0] && doseEntries[0].dosage ? doseEntries[0].dosage : '1 dose';
+
+      const payload = {
+        name,
+        dosage: dosage || primaryDose,
+        frequency: getMedicationFrequencyLabel(),
+        time: getMedicationPrimaryTimeLabel(),
+        start_date: getMedicationStartDateIso()
+      };
+
+      if (isAuthenticated) {
+        try {
+          const medResp = await mongoRequest('/medications', { method: 'POST', body: payload });
+          if (medResp && medResp.medication && medResp.medication.id) {
+            for (const entry of doseEntries) {
+              await mongoRequest('/doses', {
+                method: 'POST',
+                body: {
+                  medication_id: medResp.medication.id,
+                  medication_name: payload.name,
+                  dosage: entry.dosage || payload.dosage,
+                  scheduled_at: getScheduledAtIso(payload.start_date, entry.time),
+                  status: 'upcoming'
+                }
+              });
+            }
+          }
+        } catch (e) {
+          alert((e && e.message) ? e.message : 'Unable to save medication.');
+          return;
+        }
+      } else {
+        const items = readLocalMedications();
+        items.unshift({ id: 'local-med-' + Date.now(), ...payload, created_at: new Date().toISOString() });
+        writeLocalMedications(items);
+        const doseItems = readLocalDoses();
+        doseEntries.forEach((entry, idx) => {
+          doseItems.unshift({
+            id: 'local-dose-' + Date.now() + '-' + idx,
+            medication_name: payload.name,
+            dosage: entry.dosage || payload.dosage,
+            scheduled_at: getScheduledAtIso(payload.start_date, entry.time),
+            status: 'upcoming'
+          });
+        });
+        writeLocalDoses(doseItems);
+      }
+
+      if (nameInput) nameInput.value = '';
+      if (dosageInput) dosageInput.value = '';
+      medicationDoseTimes = [{ time: getMedicationTimeLabel(), dosage: '1 dose' }];
+      renderMedicationDoseTimes();
+      await loadMedications();
+      await loadHistoryTimeline();
+      await loadDailyProgress();
+      await loadMissedDoseAlert();
+      goBackFromAddMed();
+    };
+
+    let scannedPrescriptionItems = [];
+
+    function getDefaultScannedPrescription() {
+      return [
+        { name: 'Amoxicillin', dosage: '500mg', time: '08:00 AM', frequency: 'Daily', warning: '' },
+        { name: 'Lisinopril', dosage: '10mg', time: '09:00 PM', frequency: 'Daily', warning: 'Please double-check dosage from prescription label.' }
+      ];
+    }
+
+    function ensureScannedPrescriptionItems() {
+      if (!Array.isArray(scannedPrescriptionItems) || !scannedPrescriptionItems.length) {
+        scannedPrescriptionItems = getDefaultScannedPrescription();
+      }
+    }
+
+    function renderReviewPrescription() {
+      const listEl = document.getElementById('review-scan-list');
+      const warningWrap = document.getElementById('review-scan-warning');
+      const warningText = document.getElementById('review-scan-warning-text');
+      if (!listEl) return;
+
+      if (!scannedPrescriptionItems.length) {
+        listEl.innerHTML = `
+          <div class="med-scan-card">
+            <div class="med-scan-icon"><i class="fa-solid fa-file-circle-xmark"></i></div>
+            <div class="med-scan-info">
+              <div class="med-scan-header"><h4>No scanned medications found</h4></div>
+              <div class="med-detail-row"><i class="fa-solid fa-circle-info"></i> Scan a prescription or add medication manually.</div>
+            </div>
+          </div>
+        `;
+        if (warningWrap) warningWrap.style.display = 'none';
+        return;
+      }
+
+      listEl.innerHTML = scannedPrescriptionItems.map((item, index) => `
+        <div class="med-scan-card">
+          <div class="med-scan-icon"><i class="fa-solid fa-capsules"></i></div>
+          <div class="med-scan-info">
+            <div class="med-scan-header">
+              <h4>${escapeHtml(item.name || 'Medication')}</h4>
+              <span>
+                <i class="fa-solid fa-pencil" style="cursor:pointer;margin-right:10px;" onclick="editScannedMedication(${index})"></i>
+                <i class="fa-solid fa-trash" style="cursor:pointer;color:#ef4444;" onclick="removeScannedMedication(${index})"></i>
+              </span>
+            </div>
+            <div class="med-detail-row"><i class="fa-solid fa-box"></i> ${escapeHtml(item.dosage || '1 dose')}</div>
+            <div class="med-detail-row"><i class="fa-regular fa-clock"></i> ${escapeHtml(item.time || '08:00 AM')}</div>
+            <div class="med-detail-row"><i class="fa-regular fa-calendar-days"></i> ${escapeHtml(item.frequency || 'Daily')} Frequency</div>
+          </div>
+        </div>
+      `).join('');
+
+      const withWarning = scannedPrescriptionItems.find(i => i.warning);
+      if (withWarning && warningWrap && warningText) {
+        warningText.textContent = withWarning.warning;
+        warningWrap.style.display = 'flex';
+      } else if (warningWrap) {
+        warningWrap.style.display = 'none';
+      }
+    }
+
+    function editScannedMedication(index) {
+      const item = scannedPrescriptionItems[index];
+      if (!item) return;
+      const name = prompt('Medication name', item.name || '');
+      if (name === null) return;
+      const dosage = prompt('Dosage', item.dosage || '1 dose');
+      if (dosage === null) return;
+      const time = prompt('Time (HH:MM AM/PM)', item.time || '08:00 AM');
+      if (time === null) return;
+      const frequency = prompt('Frequency', item.frequency || 'Daily');
+      if (frequency === null) return;
+
+      scannedPrescriptionItems[index] = {
+        ...item,
+        name: String(name).trim() || item.name,
+        dosage: String(dosage).trim() || '1 dose',
+        time: String(time).trim() || '08:00 AM',
+        frequency: String(frequency).trim() || 'Daily',
+        warning: ''
+      };
+      renderReviewPrescription();
+    }
+
+    function removeScannedMedication(index) {
+      scannedPrescriptionItems = scannedPrescriptionItems.filter((_, i) => i !== index);
+      renderReviewPrescription();
+    }
+
+    async function addMedicationFromReview(item) {
+      const payload = {
+        name: item.name,
+        dosage: item.dosage || '1 dose',
+        frequency: item.frequency || 'Daily',
+        time: item.time || '08:00 AM',
+        start_date: getMedicationStartDateIso()
+      };
+
+      if (isAuthenticated) {
+        const medResp = await mongoRequest('/medications', { method: 'POST', body: payload });
+        if (medResp && medResp.medication && medResp.medication.id) {
+          await mongoRequest('/doses', {
+            method: 'POST',
+            body: {
+              medication_id: medResp.medication.id,
+              medication_name: payload.name,
+              dosage: payload.dosage,
+              scheduled_at: getScheduledAtIso(payload.start_date, payload.time),
+              status: 'upcoming'
+            }
+          });
+        }
+        return;
+      }
+
+      const items = readLocalMedications();
+      items.unshift({ id: 'local-med-' + Date.now() + '-' + Math.floor(Math.random() * 999), ...payload, created_at: new Date().toISOString() });
+      writeLocalMedications(items);
+      const doseItems = readLocalDoses();
+      doseItems.unshift({
+        id: 'local-dose-' + Date.now() + '-' + Math.floor(Math.random() * 999),
+        medication_name: payload.name,
+        dosage: payload.dosage,
+        scheduled_at: getScheduledAtIso(payload.start_date, payload.time),
+        status: 'upcoming'
+      });
+      writeLocalDoses(doseItems);
+    }
+
+    async function confirmScannedPrescription() {
+      ensureScannedPrescriptionItems();
+      if (!scannedPrescriptionItems.length) {
+        showReminderToast('No scanned medications to add.');
+        return;
+      }
+
+      let added = 0;
+      for (const med of scannedPrescriptionItems) {
+        try {
+          if (!med || !med.name) continue;
+          await addMedicationFromReview(med);
+          added += 1;
+        } catch (e) {
+          // continue adding other medications
+        }
+      }
+
+      scannedPrescriptionItems = [];
+      renderReviewPrescription();
+      await loadMedications();
+      await loadHistoryTimeline();
+      await loadDailyProgress();
+      await loadMissedDoseAlert();
+      navTo('home-screen');
+      showReminderToast(added > 0 ? ('Added ' + added + ' medication(s) to schedule.') : 'No medications were added.');
+    }
+
+    function extractTimesFromText(text) {
+      const source = String(text || '');
+      const timeRegex = /(\d{1,2}[:.]\d{2}\s?(?:AM|PM))/gi;
+      const matches = [...source.matchAll(timeRegex)]
+        .map(m => String(m[1] || '').replace('.', ':').toUpperCase().trim());
+      const unique = [];
+      matches.forEach(t => {
+        if (t && !unique.includes(t)) unique.push(t);
+      });
+      return unique;
+    }
+
+    function normalizeDoseText(doseText) {
+      const text = String(doseText || '').trim();
+      if (!text) return '1 dose';
+      return text
+        .replace(/\s+/g, ' ')
+        .replace(/MG/gi, 'mg')
+        .replace(/ML/gi, 'ml')
+        .replace(/MCG/gi, 'mcg')
+        .replace(/IU/gi, 'IU')
+        .trim();
+    }
+
+    function parseOcrPrescriptionText(rawText) {
+      const text = String(rawText || '').replace(/\r/g, '\n');
+      const lines = text
+        .split('\n')
+        .map(l => l.replace(/\s+/g, ' ').trim())
+        .filter(Boolean);
+      const items = [];
+      const medRegex = /([A-Za-z][A-Za-z0-9\- ]{2,40}?)\s+(\d+(?:\.\d+)?\s?(?:mg|ml|mcg|g|iu|units?))/i;
+
+      for (let i = 0; i < lines.length; i += 1) {
+        const line = lines[i];
+        const match = line.match(medRegex);
+        if (!match) continue;
+
+        const name = String(match[1] || '').replace(/^\d+[\).\-\s]*/, '').trim();
+        const dosage = normalizeDoseText(match[2]);
+        if (!name) continue;
+
+        const context = [lines[i], lines[i + 1] || '', lines[i + 2] || ''].join(' ');
+        const times = extractTimesFromText(context);
+        items.push({
+          name,
+          dosage,
+          time: times[0] || '08:00 AM',
+          frequency: times.length > 1 ? `Daily (${times.join(', ')})` : 'Daily',
+          warning: ''
+        });
+      }
+
+      if (items.length) return items;
+
+      // Fallback: detect medicine-like terms even if dosage is unclear
+      const fallback = [];
+      lines.forEach((line, idx) => {
+        const tokens = line.split(' ');
+        if (tokens.length < 1) return;
+        const looksLikeMed = /^[A-Za-z][A-Za-z0-9\-]{2,}$/.test(tokens[0]);
+        if (!looksLikeMed) return;
+        if (/take|tablet|capsule|daily|am|pm|after|before|meal/i.test(line)) return;
+        fallback.push({
+          name: tokens.slice(0, 2).join(' '),
+          dosage: '1 dose',
+          time: '08:00 AM',
+          frequency: 'Daily',
+          warning: idx === 0 ? 'OCR found partial text. Please verify details.' : ''
+        });
+      });
+
+      return fallback.slice(0, 3);
+    }
+
+    async function performPrescriptionOcr(videoEl) {
+      if (!videoEl || !window.Tesseract || !window.Tesseract.recognize) {
+        return [];
+      }
+      const w = videoEl.videoWidth || 0;
+      const h = videoEl.videoHeight || 0;
+      if (!w || !h) return [];
+
+      const maxW = 1280;
+      const scale = w > maxW ? (maxW / w) : 1;
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.max(1, Math.floor(w * scale));
+      canvas.height = Math.max(1, Math.floor(h * scale));
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return [];
+
+      ctx.drawImage(videoEl, 0, 0, canvas.width, canvas.height);
+      const imageDataUrl = canvas.toDataURL('image/jpeg', 0.92);
+      const result = await window.Tesseract.recognize(imageDataUrl, 'eng');
+      const text = result && result.data && result.data.text ? result.data.text : '';
+      return parseOcrPrescriptionText(text);
+    }
+
+    async function performPrescriptionOcrFromImageFile(file) {
+      if (!file || !window.Tesseract || !window.Tesseract.recognize) return [];
+      const result = await window.Tesseract.recognize(file, 'eng');
+      const text = result && result.data && result.data.text ? result.data.text : '';
+      return parseOcrPrescriptionText(text);
+    }
+
+    function triggerPrescriptionUpload() {
+      const input = document.getElementById('prescription-upload-input');
+      if (!input) return;
+      input.value = '';
+      input.click();
+    }
+
+    async function handlePrescriptionUpload(event) {
+      const input = event && event.target ? event.target : null;
+      const file = input && input.files && input.files[0] ? input.files[0] : null;
+      if (!file) return;
+
+      showReminderToast('Reading prescription image...');
+      try {
+        const extracted = await performPrescriptionOcrFromImageFile(file);
+        if (Array.isArray(extracted) && extracted.length) {
+          scannedPrescriptionItems = extracted;
+          showReminderToast(`OCR found ${extracted.length} medication(s).`);
+        } else {
+          ensureScannedPrescriptionItems();
+          scannedPrescriptionItems = scannedPrescriptionItems.map((item, idx) => ({
+            ...item,
+            warning: idx === 0 ? 'OCR could not confidently read all details. Please verify.' : item.warning
+          }));
+          showReminderToast('OCR could not read clearly. Please edit manually.');
+        }
+      } catch (e) {
+        ensureScannedPrescriptionItems();
+        showReminderToast('Image OCR failed. Please try a clearer image.');
+      } finally {
+        renderReviewPrescription();
+        navTo('review-screen');
+      }
+    }
+
+    startCameraScan = function () {
+      const overlay = document.getElementById('camera-overlay');
+      const video = document.getElementById('camera-video');
+      const finalizeScan = () => {
+        ensureScannedPrescriptionItems();
+        renderReviewPrescription();
+        navTo('review-screen');
+      };
+
+      if (!overlay || !video) {
+        finalizeScan();
+        return;
+      }
+
+      if (!window.isSecureContext || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        showReminderToast('Camera unavailable on this mobile page. Upload image instead.');
+        triggerPrescriptionUpload();
+        return;
+      }
+
+      overlay.classList.add('active');
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+          .then(stream => {
+            cameraStream = stream;
+            video.srcObject = stream;
+            setTimeout(async () => {
+              showReminderToast('Scanning prescription...');
+              try {
+                const extracted = await performPrescriptionOcr(video);
+                if (Array.isArray(extracted) && extracted.length) {
+                  scannedPrescriptionItems = extracted;
+                  showReminderToast(`OCR found ${extracted.length} medication(s).`);
+                } else {
+                  ensureScannedPrescriptionItems();
+                  scannedPrescriptionItems = scannedPrescriptionItems.map((item, idx) => ({
+                    ...item,
+                    warning: idx === 0 ? 'OCR could not confidently read all details. Please verify.' : item.warning
+                  }));
+                  showReminderToast('OCR could not read clearly. Showing review defaults.');
+                }
+              } catch (e) {
+                ensureScannedPrescriptionItems();
+                showReminderToast('OCR failed. Please review and edit manually.');
+              } finally {
+                stopCameraScan();
+                finalizeScan();
+              }
+            }, 2500);
+          })
+          .catch(() => {
+            stopCameraScan();
+            finalizeScan();
+          });
+      } else {
+        finalizeScan();
+      }
+    };
+
+    const originalNavTo = navTo;
+    navTo = function (targetScreenId) {
+      originalNavTo(targetScreenId);
+      if (targetScreenId === 'review-screen') {
+        ensureScannedPrescriptionItems();
+        renderReviewPrescription();
+      }
+    };
+  </script>
+</body>
+</html>
+
