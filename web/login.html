@@ -3032,11 +3032,32 @@
       }
     }
 
+    function speakWithDeviceTts(text, languageCode) {
+      if (!('speechSynthesis' in window) || typeof window.SpeechSynthesisUtterance !== 'function') {
+        return false;
+      }
+      try {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = languageCode;
+        utterance.rate = 0.95;
+        utterance.pitch = 1;
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(utterance);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+
     async function speakReminder(message) {
       const text = String(message || '').trim();
       if (!text || !isAuthenticated) return;
       const lang = getSelectedLanguage();
       const languageCode = toTtsLanguageCode(lang);
+
+      // APK/mobile timers often block autoplay audio, so prefer device TTS first.
+      if (speakWithDeviceTts(text, languageCode)) return;
+
       try {
         const data = await mongoRequest('/services/tts', {
           method: 'POST',
@@ -3050,12 +3071,7 @@
         activeSpeechAudio = audio;
         await audio.play();
       } catch (e) {
-        if ('speechSynthesis' in window) {
-          const utterance = new SpeechSynthesisUtterance(text);
-          utterance.lang = languageCode;
-          window.speechSynthesis.cancel();
-          window.speechSynthesis.speak(utterance);
-        }
+        speakWithDeviceTts(text, languageCode);
       }
     }
 
@@ -3917,6 +3933,18 @@
       input.click();
     }
 
+    function isNativeCapacitorApp() {
+      try {
+        if (window.Capacitor && typeof window.Capacitor.isNativePlatform === 'function') {
+          return !!window.Capacitor.isNativePlatform();
+        }
+        const protocol = window.location && window.location.protocol ? window.location.protocol : '';
+        return protocol === 'capacitor:' || protocol === 'ionic:';
+      } catch (e) {
+        return false;
+      }
+    }
+
     async function handlePrescriptionUpload(event) {
       const input = event && event.target ? event.target : null;
       const file = input && input.files && input.files[0] ? input.files[0] : null;
@@ -3954,6 +3982,13 @@
         navTo('review-screen');
       };
 
+      // In APK/WebView, file picker + native camera intent is more reliable than getUserMedia.
+      if (isNativeCapacitorApp()) {
+        showReminderToast('Opening camera/gallery...');
+        triggerPrescriptionUpload();
+        return;
+      }
+
       if (!overlay || !video) {
         finalizeScan();
         return;
@@ -3967,8 +4002,18 @@
 
       overlay.classList.add('active');
       if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        let streamStarted = false;
+        const startupFallback = setTimeout(() => {
+          if (streamStarted) return;
+          stopCameraScan();
+          showReminderToast('Camera startup is slow. Opening upload instead.');
+          triggerPrescriptionUpload();
+        }, 4500);
+
         navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
           .then(stream => {
+            streamStarted = true;
+            clearTimeout(startupFallback);
             cameraStream = stream;
             video.srcObject = stream;
             setTimeout(async () => {
@@ -3996,11 +4041,13 @@
             }, 2500);
           })
           .catch(() => {
+            clearTimeout(startupFallback);
             stopCameraScan();
-            finalizeScan();
+            showReminderToast('Camera access failed. Opening upload instead.');
+            triggerPrescriptionUpload();
           });
       } else {
-        finalizeScan();
+        triggerPrescriptionUpload();
       }
     };
 
