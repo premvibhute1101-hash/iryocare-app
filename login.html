@@ -1409,6 +1409,8 @@
     let medicationCache = [];
     let editingMedicationId = null;
     let pendingRemoveMedicationId = null;
+    let reminderAudioContext = null;
+    let reminderAudioUnlocked = false;
 
     function showReminderToast(message) {
       const toast = document.getElementById('reminder-toast');
@@ -1420,6 +1422,65 @@
       }, 2600);
     }
 
+    function ensureReminderAudioContext() {
+      if (reminderAudioContext) return reminderAudioContext;
+      try {
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        if (!Ctx) return null;
+        reminderAudioContext = new Ctx();
+      } catch (e) {
+        reminderAudioContext = null;
+      }
+      return reminderAudioContext;
+    }
+
+    async function unlockReminderAudio() {
+      const ctx = ensureReminderAudioContext();
+      if (!ctx) return false;
+      try {
+        if (ctx.state === 'suspended') {
+          await ctx.resume();
+        }
+        reminderAudioUnlocked = ctx.state === 'running';
+      } catch (e) {
+        reminderAudioUnlocked = false;
+      }
+      return reminderAudioUnlocked;
+    }
+
+    function playReminderBeep() {
+      const ctx = ensureReminderAudioContext();
+      if (!ctx || !reminderAudioUnlocked) return;
+      try {
+        const now = ctx.currentTime;
+        const o1 = ctx.createOscillator();
+        const g1 = ctx.createGain();
+        o1.type = 'sine';
+        o1.frequency.setValueAtTime(880, now);
+        g1.gain.setValueAtTime(0.0001, now);
+        g1.gain.exponentialRampToValueAtTime(0.18, now + 0.02);
+        g1.gain.exponentialRampToValueAtTime(0.0001, now + 0.25);
+        o1.connect(g1);
+        g1.connect(ctx.destination);
+        o1.start(now);
+        o1.stop(now + 0.26);
+
+        const o2 = ctx.createOscillator();
+        const g2 = ctx.createGain();
+        o2.type = 'sine';
+        o2.frequency.setValueAtTime(988, now + 0.28);
+        g2.gain.setValueAtTime(0.0001, now + 0.28);
+        g2.gain.exponentialRampToValueAtTime(0.14, now + 0.30);
+        g2.gain.exponentialRampToValueAtTime(0.0001, now + 0.52);
+        o2.connect(g2);
+        g2.connect(ctx.destination);
+        o2.start(now + 0.28);
+        o2.stop(now + 0.53);
+      } catch (e) {
+        // ignore audio errors
+      }
+    }
+
     function notifyMedicationReminder(message) {
       if ('Notification' in window && Notification.permission === 'granted') {
         try {
@@ -1429,6 +1490,7 @@
         }
       }
       showReminderToast(message);
+      playReminderBeep();
       speakReminder(message).catch(() => {});
     }
 
@@ -1546,6 +1608,7 @@
       }
 
       if ('Notification' in window && Notification.permission === 'default') {
+        unlockReminderAudio().catch(() => {});
         Notification.requestPermission().then(() => {
           scheduleMedicationReminders();
           showReminderToast('Medication reminders turned on.');
@@ -1556,6 +1619,7 @@
         return;
       }
 
+      unlockReminderAudio().catch(() => {});
       scheduleMedicationReminders();
       showReminderToast('Medication reminders turned on.');
     }
@@ -3841,7 +3905,32 @@
         .map(l => l.replace(/\s+/g, ' ').trim())
         .filter(Boolean);
       const items = [];
-      const medRegex = /([A-Za-z][A-Za-z0-9\- ]{2,40}?)\s+(\d+(?:\.\d+)?\s?(?:mg|ml|mcg|g|iu|units?))/i;
+      const medRegex = /([A-Za-z][A-Za-z0-9\- ]{1,40}?)\s+(\d+(?:\.\d+)?\s?(?:mg|ml|mcg|g|iu|units?|tab|tabs|tablet|cap|capsule))/i;
+      const seenNames = new Set();
+
+      function sanitizeName(value) {
+        return String(value || '')
+          .replace(/[|\\/_*~`]+/g, ' ')
+          .replace(/\b(?:tab|tabs|tablet|capsule|cap|syrup|inj|injection|dose|daily|od|bd|tid|hs|morning|night|after|before)\b/gi, ' ')
+          .replace(/\s+/g, ' ')
+          .trim();
+      }
+
+      function pushItem(name, dosage, contextLine, warning = '') {
+        const cleanName = sanitizeName(name);
+        if (!cleanName || cleanName.length < 2) return;
+        const key = cleanName.toLowerCase();
+        if (seenNames.has(key)) return;
+        seenNames.add(key);
+        const times = extractTimesFromText(contextLine || '');
+        items.push({
+          name: cleanName,
+          dosage: normalizeDoseText(dosage || '1 dose'),
+          time: times[0] || '08:00 AM',
+          frequency: times.length > 1 ? `Daily (${times.join(', ')})` : 'Daily',
+          warning
+        });
+      }
 
       for (let i = 0; i < lines.length; i += 1) {
         const line = lines[i];
@@ -3853,17 +3942,34 @@
         if (!name) continue;
 
         const context = [lines[i], lines[i + 1] || '', lines[i + 2] || ''].join(' ');
-        const times = extractTimesFromText(context);
-        items.push({
-          name,
-          dosage,
-          time: times[0] || '08:00 AM',
-          frequency: times.length > 1 ? `Daily (${times.join(', ')})` : 'Daily',
-          warning: ''
-        });
+        pushItem(name, dosage, context);
       }
 
       if (items.length) return items;
+
+      // Handwritten-friendly heuristic: pick medicine-like leading words even when dosage is unreadable.
+      for (let i = 0; i < lines.length; i += 1) {
+        const line = lines[i];
+        if (!line || line.length < 2) continue;
+        if (/^\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}$/.test(line)) continue; // dates
+        if (/^\+?\d[\d\s\-]{7,}$/.test(line)) continue; // phone-like
+        if (/(dr\.?|doctor|clinic|hospital|rx|prescription|patient|age|gender|address|diagnosis)/i.test(line)) continue;
+
+        const dosageMatch = line.match(/(\d+(?:\.\d+)?\s?(?:mg|ml|mcg|g|iu|units?|tab|tabs|tablet|cap|capsule))/i);
+        const beforeDose = dosageMatch ? line.slice(0, dosageMatch.index).trim() : line;
+        const nameTokens = beforeDose
+          .replace(/^[\d\W]+/, '')
+          .split(/\s+/)
+          .filter(Boolean)
+          .slice(0, 3);
+        const candidate = sanitizeName(nameTokens.join(' '));
+        if (!candidate) continue;
+        if (!/^[A-Za-z][A-Za-z0-9\- ]+$/.test(candidate)) continue;
+        if (candidate.length < 3) continue;
+        pushItem(candidate, dosageMatch ? dosageMatch[1] : '1 dose', line, 'Handwritten OCR may be partial. Please verify.');
+      }
+
+      if (items.length) return items.slice(0, 8);
 
       // Fallback: detect medicine-like terms even if dosage is unclear
       const fallback = [];
@@ -3874,7 +3980,7 @@
         if (!looksLikeMed) return;
         if (/take|tablet|capsule|daily|am|pm|after|before|meal/i.test(line)) return;
         fallback.push({
-          name: tokens.slice(0, 2).join(' '),
+          name: sanitizeName(tokens.slice(0, 3).join(' ')),
           dosage: '1 dose',
           time: '08:00 AM',
           frequency: 'Daily',
